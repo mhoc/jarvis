@@ -57,4 +57,4 @@ The `respond` parameter on run is a function through which you provide a slackMs
 { "text": "The body of the message to send back.", "channel": "the channel id" }
 ```
 
-It is adequate enough to simply modify the text element of the `msg` passed in then reuse the rest. If you want to post to a different channel then you'll need something
+It is adequate enough to simply modify the `text` element of the `msg` passed in then reuse the rest. If you want to post to a different channel then you'll need to know the channel Id and can modify the `channel` element. You can get the channelId for other channels through methods in `util/slack`.
