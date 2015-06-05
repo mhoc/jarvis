@@ -1,18 +1,16 @@
 
 var logger = require('log4js').getLogger();
-
 var storedPurpose = "To serve the citizens of the glorious SIGAPP nation."
 
-logger.trace('Creating purpose commands');
 module.exports = [
   {
-    description: "Gives me purpose in life.",
+    description: "gives me purpose in life.",
 
     match: [
-      /[Jj]arvis your purpose is (.+)/,
-      /[Jj]arvis your purpose in life is (.+)/,
-      /[Jj]arvis your new purpose is (.+)/,
-      /[Jj]arvis your new purpose in life is (.+)/
+      /jarvis your purpose is (.+)/,
+      /jarvis your purpose in life is (.+)/,
+      /jarvis your new purpose is (.+)/,
+      /jarvis your new purpose in life is (.+)/
     ],
 
     run: function(msg, respond) {
@@ -23,7 +21,7 @@ module.exports = [
     }
   },
   {
-    description: "Shares my purpose in life with you.",
+    description: "shares my purpose in life with you.",
 
     match: [
       /jarvis what is your purpose/

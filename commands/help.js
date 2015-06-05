@@ -1,17 +1,15 @@
 
 var logger = require('log4js').getLogger();
 
-logger.trace('Creating help command');
-
 module.exports = {
 
-  description: "Provides a link to a glossary of commands I support.",
+  description: "provides a link to a glossary of commands I support.",
 
   match: [
-    /[Jj]arvis help/,
-    /[Jj]arvis help me/,
-    /[Jj]arvis what commands do you support/,
-    /[Jj]arvis what can you do/,
+    /jarvis help/,
+    /jarvis help me/,
+    /jarvis what commands do you support/,
+    /jarvis what can you do/,
   ],
 
   run: function(msg, respond) {
