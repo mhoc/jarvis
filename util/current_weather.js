@@ -7,6 +7,7 @@ var request = require('request')
 // @param lng float
 // @param callback function(err, obj)
 module.exports = function(lat, lng, callback) {
+  logger.trace('Making request to weather api for current weather')
 
   // Read envvar
   apiKey = process.env.DARK_SKY_API_TOKEN

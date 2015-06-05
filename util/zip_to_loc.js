@@ -9,6 +9,7 @@ var request = require('request')
 // obj: contains fields like "lat", "lng", "city", "state", "timezone.timezone_abbr"
 // See full documentation on http://zipcodeapi.com
 module.exports = function(zipcode, callback) {
+  logger.trace('Making request to zip code api for location object')
 
   // Read the environ
   var apiKey = process.env.ZIP_CODE_API_TOKEN
