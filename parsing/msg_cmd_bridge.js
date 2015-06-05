@@ -10,6 +10,7 @@ module.exports = function(slackMsg, writeback) {
     command.match.forEach(function(matchPhrase) {
       result = slackMsg.text.match(matchPhrase)
       if (result != null) {
+        slackMsg._matchResult = result
         command.run(slackMsg, writeback)
       }
     })
