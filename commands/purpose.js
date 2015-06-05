@@ -1,7 +1,7 @@
 
 var logger = require('log4js').getLogger();
 
-var storedPurpose = "to serve you."
+var storedPurpose = "To serve the citizens of the glorious SIGAPP nation."
 
 logger.trace('Creating purpose commands');
 module.exports = [
@@ -18,7 +18,8 @@ module.exports = [
     run: function(msg, respond) {
       logger.info('Running set purpose command')
       storedPurpose = msg._matchResult[1]
-      respond('Ok, my new purpose in life is ' + storedPurpose, msg.channel)
+      msg.text = 'Ok, my new purpose in life is ' + storedPurpose
+      respond(msg)
     }
   },
   {
@@ -30,7 +31,8 @@ module.exports = [
 
     run: function(msg, respond) {
       logger.info('Running get purpose command')
-      respond(storedPurpose, msg.channel)
+      msg.text = storedPurpose
+      respond(msg)
     }
 
   }

@@ -16,7 +16,8 @@ module.exports = {
 
   run: function(msg, respond) {
     logger.info('Running help command')
-    respond('Jarvis, at your service.\nYou can find a full documentation of my capabilities at http://github.com/mhoc/jarvis', msg.channel)
+    msg.text = 'Jarvis, at your service.\nYou can find a full documentation of my capabilities at http://github.com/mhoc/jarvis'
+    respond(msg)
   }
 
 }

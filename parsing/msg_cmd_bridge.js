@@ -12,6 +12,7 @@ module.exports = function(slackMsg, writeback) {
       if (result != null) {
         slackMsg._matchResult = result
         command.run(slackMsg, writeback)
+        return
       }
     })
   })

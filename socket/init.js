@@ -5,12 +5,12 @@ var wsClient = require('websocket').client
 var connection = null
 
 // Writes to the socket
-var sendMessage = function(message, chan) {
+var sendMessage = function(msg) {
   connection.sendUTF(JSON.stringify({
     id: 1,
     type: "message",
-    channel: chan,
-    text: message
+    channel: msg.channel,
+    text: msg.text
   }))
 }
 
