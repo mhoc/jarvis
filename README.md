@@ -4,9 +4,21 @@ Or, a worse hubot, depending on how you see it.
 
 # Installing
 
-You need to provie an authentication token in the envvar SLACK_AUTH_TOKEN before starting. You can get this by going to the slack admin console, setting up a new Bot integration, giving it all the parameters you want (like naming it jarvis), and the key should be on that page. 
+1. Set up the API keys as outlined below
 
-Other than that, `npm install` once then `npm start` to start up the server. You should see log output immediately. 
+2. `npm install`
+
+3. `npm start`
+
+# APIs
+
+This bot does and will use quite a few APIs. The only one that's required is the slack auth token, obviously. If you are missing an API key for any of the others, that command will just not function. API keys should be set as an env var with the name given. All APIs should and do have free tiers that are adequate for even heavy usage of Jarvis.
+
+* `SLACK_AUTH_TOKEN`: The authorization token for slack. Create a new bot integration and it should give you a token. (REQUIRED).
+
+* `DARK_SKY_API_TOKEN`: Used for weather information. http://developer.forecast.io.
+
+* `ZIP_CODE_API_TOKEN`: Used to convert zip codes to locations for things like weather. http://zipcodeapi.com.
 
 # Writing Commands
 
