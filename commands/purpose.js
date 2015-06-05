@@ -9,10 +9,10 @@ module.exports = [
     description: "Gives me purpose in life.",
 
     match: [
-      /jarvis your purpose is (.+)/,
-      /jarvis your purpose in life is (.+)/,
-      /jarvis your new purpose is (.+)/,
-      /jarvis your new purpose in life is (.+)/
+      /[Jj]arvis your purpose is (.+)/,
+      /[Jj]arvis your purpose in life is (.+)/,
+      /[Jj]arvis your new purpose is (.+)/,
+      /[Jj]arvis your new purpose in life is (.+)/
     ],
 
     run: function(msg, respond) {

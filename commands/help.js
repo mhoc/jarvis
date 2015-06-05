@@ -8,10 +8,10 @@ module.exports = {
   description: "Provides a link to a glossary of commands I support.",
 
   match: [
-    /jarvis help/,
-    /jarvis help me/,
-    /jarvis what commands do you support/,
-    /jarvis what can you do/,
+    /[Jj]arvis help/,
+    /[Jj]arvis help me/,
+    /[Jj]arvis what commands do you support/,
+    /[Jj]arvis what can you do/,
   ],
 
   run: function(msg, respond) {
