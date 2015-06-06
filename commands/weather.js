@@ -9,6 +9,7 @@ module.exports = [
 
     match: [
       /jarvis weather (.*)/,
+      /jarvis weather for (.*)/,
       /jarvis give me the weather for (.*)/
     ],
 
@@ -19,6 +20,11 @@ module.exports = [
       // We will assume its a zip code for now
       zipToLoc(location, function(err, locData) {
         currentWeather(locData.lat, locData.lng, function(err, weatherData) {
+          if (err || !weatherData.minutely || !weatherData.currently) {
+            slackMsg.text = "I'm unable to correctly contact the service I use for weather data."
+            respond(slackMsg)
+            return
+          }
           resStr  = weatherData.minutely.summary + "\n"
           resStr += "The current temperature is " + Math.floor(weatherData.currently.temperature) + "°F."
           slackMsg.text = resStr

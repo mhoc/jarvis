@@ -2,9 +2,23 @@
 // Any deterministic replies where jarvis doesn't need external data.
 // Essentially stupid stuff that's just for fun, or help, or links to things, etc etc.
 var logger = require('log4js').getLogger()
+var request = require('request')
 var slack = require('../util/slack')
 
 module.exports = [
+  {
+    description: "provides a cool status printout.",
+
+    match: [
+      /jarvis status/,
+    ],
+
+    run: function(msg, respond) {
+      logger.info("Running status command")
+      msg.text = "Don't worry, I'm alive.\n"
+      respond(msg)
+    }
+  },
   {
     description: "provides a link to a glossary of commands I support.",
 

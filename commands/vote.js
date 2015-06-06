@@ -40,8 +40,6 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      if (activeV)
-      activeVotes[msg._matchResult[1]
     }
   }
 
