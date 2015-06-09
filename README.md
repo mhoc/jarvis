@@ -20,6 +20,12 @@ This bot does and will use quite a few APIs. The only one that's required is the
 
 * `ZIP_CODE_API_TOKEN`: Used to convert zip codes to locations for things like weather. http://zipcodeapi.com.
 
+# Config
+
+The config.json file has a few configuration parameters you can set.
+
+* `admins`: an array of slack userids which are "admin" users of jarvis. These users have access to commands located in the `commands/admin` file (though not by default, that's just where I put the admin commands at). Right now this only includes the ability to order jarvis to kill himself. Lol.
+
 # Writing Commands
 
 Every js file in the commands directory contains a command. Wait, that's obvious. Each command is formatted like so:

@@ -38,9 +38,12 @@ module.exports = [
 
       // Alert node scheduler
       scheduler.scheduleJob(target, function(m) {
-        msg.text = "You told me to remind you to " + m._matchResult[3]
+        msg.text = "<@" + m.user + ">: You told me to remind you to " + m._matchResult[3]
         respond(msg)
       }.bind(null, msg))
+
+      msg.text = "Ok, I'll be sure to remind you."
+      respond(msg)
 
     }
 

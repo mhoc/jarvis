@@ -1,3 +1,5 @@
 {
-  "Uhh": "Honestly this is just here to store stuff while we run, there are no static settings yet"
+  "admins": [
+    "@UserIdHere"
+  ]
 }
