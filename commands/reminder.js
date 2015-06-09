@@ -12,7 +12,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running reminder command')
+      logger.info('Running set reminder command')
 
       // Parse the input
       var addSeconds = 0;
@@ -38,8 +38,8 @@ module.exports = [
 
       // Alert node scheduler
       scheduler.scheduleJob(target, function(m) {
-        msg.text = "<@" + m.user + ">: You told me to remind you to " + m._matchResult[3]
-        respond(msg)
+        m.text = "<@" + m.user + ">: You told me to remind you to " + m._matchResult[3]
+        respond(m)
       }.bind(null, msg))
 
       msg.text = "Ok, I'll be sure to remind you."
