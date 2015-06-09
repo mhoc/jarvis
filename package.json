@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "log4js": "^0.6.25",
+    "node-schedule": "^0.2.8",
     "request": "^2.57.0",
     "websocket": "^1.0.19"
   },

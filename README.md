@@ -12,7 +12,7 @@ Or, a worse hubot, depending on how you see it.
 
 # APIs
 
-This bot does and will use quite a few APIs. The only one that's required is the slack auth token, obviously. If you are missing an API key for any of the others, that command will just not function. API keys should be set as an env var with the name given. All APIs should and do have free tiers that are adequate for even heavy usage of Jarvis.
+This bot does and will use quite a few APIs. The only one that's required is the slack auth token, obviously. If you are missing an API key for any of the others, the commands which require it  will just not function. API keys should be set as an env var with the name given. All APIs should and do have free tiers that are adequate for even heavy usage of Jarvis.
 
 * `SLACK_AUTH_TOKEN`: The authorization token for slack. Create a new bot integration and it should give you a token. (REQUIRED).
 
@@ -27,7 +27,7 @@ Every js file in the commands directory contains a command. Wait, that's obvious
 ```
 module.exports = {
   description: "Imagine jarvis himself is saying this. That's how this should sound.",
-  match: [ /regex/, /array/ ],
+  match: [ /jarvis help/, /jarvis help me/ ],
   run: function(msg, respond) {}
 }
 ```
