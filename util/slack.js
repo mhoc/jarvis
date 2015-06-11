@@ -22,6 +22,7 @@ module.exports = {
     }, function(err, res, body) {
       if (err != null) {
         log.error('Error contacting slack api for user status')
+        log.error(err)
       }
       callback(err, body.presence === "active")
     })

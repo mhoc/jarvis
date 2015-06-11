@@ -7,12 +7,13 @@ module.exports = {
 
   match: [
     /jarvis status/,
-    /jarvis ping/
+    /jarvis ping/,
+    /jarvis you there/
   ],
 
   run: function(msg, respond) {
     log.trace("Running status command")
-    msg.text = "Don't worry, I'm alive.\n"
+    msg.text = "Jarvis, at your service.\n"
 
     // Exec git status
     exec('git rev-parse HEAD', function(err, stdout, stderr) {
@@ -21,7 +22,7 @@ module.exports = {
         respond(msg)
         return
       }
-      msg.text += "I'm currently running jarvis version " + stdout.substring(0, 6) + "."
+      msg.text += "I'm currently running jarvis version " + stdout.substring(0, 6) + " on " + process.env.MACHINE + "."
       respond(msg)
     })
 

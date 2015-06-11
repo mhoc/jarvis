@@ -11,8 +11,9 @@ module.exports = function(lat, lng, callback) {
 
   // Read envvar
   apiKey = process.env.DARK_SKY_API_TOKEN
-  if (apiKey == null || apiKey == "") {
+  if (apiKey == null || apiKey === "") {
     log.warn('No API key provided for dark sky, cannot get weather information')
+    callback("No API key provided", null)
     return
   }
 
@@ -22,7 +23,8 @@ module.exports = function(lat, lng, callback) {
   },
     function(err, res, body) {
       if (err != null) {
-        log.error('Error contacting dark sky api')
+        log.warn('Error contacting dark sky api')
+        log.warn(err)
       }
       callback(err, body)
     }

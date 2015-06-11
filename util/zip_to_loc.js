@@ -15,6 +15,7 @@ module.exports = function(zipcode, callback) {
   var apiKey = process.env.ZIP_CODE_API_TOKEN
   if (apiKey == null || apiKey === "") {
     log.warn('Attempted to access zip code api but no api key set')
+    callback('No zip code api key provided', null)
     return
   }
 
@@ -25,7 +26,8 @@ module.exports = function(zipcode, callback) {
   },
     function(err, res, body) {
       if (err != null) {
-        log.error('Error contacting zipcode api')
+        log.warn('Error contacting zipcode api')
+        log.warn(err)
       }
       callback(err, body)
   })
