@@ -1,6 +1,6 @@
 
 var currentWeather = require('../util/current_weather')
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 var zipToLoc = require('../util/zip_to_loc')
 
 module.exports = [
@@ -15,7 +15,7 @@ module.exports = [
     ],
 
     run: function(slackMsg, respond) {
-      logger.info('Running weather command')
+      log.trace('Running weather command')
       location = slackMsg._matchResult[1]
 
       // We will assume its a zip code for now

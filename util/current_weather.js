@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 var request = require('request')
 
 // Returns a weather information object for a given latitude and longitude
@@ -7,12 +7,12 @@ var request = require('request')
 // @param lng float
 // @param callback function(err, obj)
 module.exports = function(lat, lng, callback) {
-  logger.trace('Making request to weather api for current weather')
+  log.trace('Making request to weather api for current weather')
 
   // Read envvar
   apiKey = process.env.DARK_SKY_API_TOKEN
   if (apiKey == null || apiKey == "") {
-    logger.warn('No API key provided for dark sky, cannot get weather information')
+    log.warn('No API key provided for dark sky, cannot get weather information')
     return
   }
 
@@ -22,7 +22,7 @@ module.exports = function(lat, lng, callback) {
   },
     function(err, res, body) {
       if (err != null) {
-        logger.error('Error contacting dark sky api')
+        log.error('Error contacting dark sky api')
       }
       callback(err, body)
     }

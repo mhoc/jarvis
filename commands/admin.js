@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 
 module.exports = [
 
@@ -11,7 +11,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      
+      log.trace('Running admin kill yourself command')
     }
 
   }

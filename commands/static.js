@@ -1,7 +1,7 @@
 
 // Any deterministic replies where jarvis doesn't need external data.
 // Essentially stupid stuff that's just for fun, or help, or links to things, etc etc.
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 var request = require('request')
 var slack = require('../util/slack')
 
@@ -17,7 +17,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running help command')
+      log.trace('Running help command')
       msg.text = 'Jarvis, at your service.\nYou can find a full documentation of my capabilities at http://github.com/mhoc/jarvis'
       respond(msg)
     }
@@ -32,7 +32,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running sigapp info command')
+      log.trace('Running sigapp info command')
       msg.text =  'SIGAPP meets every Tuesday and Thursday at 7pm, and every Saturday at 4pm.\n'
       msg.text += 'You can find our code at http://github.com/purdue-acm-sigapp\n'
       msg.text += 'and our wiki with in-depth information about everything we do at http://github.com/purdue-acm-sigapp/wiki/wiki.'
@@ -47,7 +47,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running amazon command')
+      log.trace('Running amazon command')
       slack.is_user_online("U02GY0X1R", function(err, isOnline) {
         if (isOnline) {
           msg.text = "Oh its the best company of all time, no doubt about it guys."

@@ -1,6 +1,6 @@
 
 var id = require('../util/id')
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 
 // We only allow one vote per slack channel at any time
 var activeVotes = {}
@@ -16,6 +16,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
+      log.trace('Running start a new poll command')
 
       // Check if there is already a vote going on for that channel
       if (activeVotes[msg.channel] != null) {
@@ -40,6 +41,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
+      log.trace('Running vote on a poll command')
     }
   }
 

@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 var scheduler = require('node-schedule')
 
 module.exports = [
@@ -12,7 +12,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running set reminder command')
+      log.trace('Running set reminder command')
 
       // Parse the input
       var addSeconds = 0;

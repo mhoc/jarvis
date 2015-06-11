@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 var request = require('request')
 
 // Converts a zip code into a more specific location object using the zipcodeapi
@@ -9,12 +9,12 @@ var request = require('request')
 // obj: contains fields like "lat", "lng", "city", "state", "timezone.timezone_abbr"
 // See full documentation on http://zipcodeapi.com
 module.exports = function(zipcode, callback) {
-  logger.trace('Making request to zip code api for location object')
+  log.trace('Making request to zip code api for location object')
 
   // Read the environ
   var apiKey = process.env.ZIP_CODE_API_TOKEN
   if (apiKey == null || apiKey === "") {
-    logger.warn('Attempted to access zip code api but no api key set')
+    log.warn('Attempted to access zip code api but no api key set')
     return
   }
 
@@ -25,7 +25,7 @@ module.exports = function(zipcode, callback) {
   },
     function(err, res, body) {
       if (err != null) {
-        logger.error('Error contacting zipcode api')
+        log.error('Error contacting zipcode api')
       }
       callback(err, body)
   })

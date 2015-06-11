@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger();
+var log = require('tablog')
 var storedPurpose = "To serve the citizens of the glorious SIGAPP nation."
 
 module.exports = [
@@ -14,7 +14,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running set purpose command')
+      log.trace('Running set purpose command')
       storedPurpose = msg._matchResult[1]
       msg.text = 'Ok, my new purpose in life is ' + storedPurpose
       respond(msg)
@@ -28,7 +28,7 @@ module.exports = [
     ],
 
     run: function(msg, respond) {
-      logger.info('Running get purpose command')
+      log.trace('Running get purpose command')
       msg.text = storedPurpose
       respond(msg)
     }

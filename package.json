@@ -7,9 +7,9 @@
     "url": "http://github.com/mhoc/jarvis"
   },
   "dependencies": {
-    "log4js": "^0.6.25",
     "node-schedule": "^0.2.8",
     "request": "^2.57.0",
+    "tablog": "0.0.1",
     "websocket": "^1.0.19"
   },
   "scripts": {

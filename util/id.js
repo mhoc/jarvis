@@ -1,5 +1,5 @@
 
-var logger = require('log4js').getLogger()
+var log = require('tablog')
 
 // Generates a new id of a given length for use in whatever a command
 // might need it to be used in.
