@@ -10,6 +10,7 @@ module.exports = [
     match: [
       /jarvis weather (.*)/,
       /jarvis weather for (.*)/,
+      /jarvis weather at (.*)/,
       /jarvis give me the weather for (.*)/
     ],
 
@@ -33,20 +34,5 @@ module.exports = [
       })
 
     }
-
-  },
-  {
-
-    description: "gives the weather for your current location.",
-
-    match: [
-      /jarvis my weather/,
-      /jarvis whats the weather like outside/
-    ],
-
-    run: function(slackMsg, respond) {
-
-    }
-
   }
 ]
