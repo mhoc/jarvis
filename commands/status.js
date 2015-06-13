@@ -22,7 +22,7 @@ module.exports = {
         respond(msg)
         return
       }
-      msg.text += "I'm currently running jarvis version " + stdout.substring(0, 6) + " on " + process.env.MACHINE + "."
+      msg.text += "I'm currently running jarvis version " + stdout.substring(0, 6) + " on " + require('../config').machine_name + "."
       respond(msg)
     })
 
