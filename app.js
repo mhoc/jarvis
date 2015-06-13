@@ -1,6 +1,6 @@
 
 var log = require('tablog')
-log.trace('Starting')
+log.trace('Starting setup')
 
 // Check envvars to see if they're all set up
 require('./lib/config_check')()
