@@ -15,10 +15,4 @@ describe('Kill Command', function() {
       assert(cmd.run)
     })
   })
-  describe('Run', function() {
-    it('Run should fail if user is not authed', function() {
-      msg = {'user': '12345'}
-      cmd.run(msg, function(){})
-    })
-  })
 })
