@@ -1,4 +1,5 @@
 
+var config = require('../config')
 var log = require('tablog')
 
 module.exports = {
@@ -12,9 +13,16 @@ module.exports = {
   run: function(msg, respond) {
     log.trace('Running admin kill yourself command')
 
+    // Check if the command is enabled
+    if (!config.enable_kill) {
+      msg.text = "My current environment does not allow me to execute that command. My appologizes."
+      respond(msg)
+      return
+    }
+
     // Check to make sure the user is authenticated to do this
     authed = false
-    require('../config').admins.forEach(function(admin) {
+    config.admins.forEach(function(admin) {
       if (admin === msg.user) {
         authed = true
       }
