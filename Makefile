@@ -7,4 +7,4 @@ test:
 	npm test
 
 tree:
-	@tree -I node_modules
+	@tree -I node_modules -AC
