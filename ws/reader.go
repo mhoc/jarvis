@@ -2,20 +2,25 @@
 package ws
 
 import (
-  log "github.com/Sirupsen/logrus"
+  "github.com/mhoc/jarvis/log"
   "golang.org/x/net/websocket"
 )
 
-var receivers []chan map[string]interface{}
+var receivers = make([]chan map[string]interface{}, 0)
 
 func StartReading(ws *websocket.Conn) {
   log.Info("Beginning read loop on websocket")
   for {
     frame := make(map[string]interface{})
-    err := websocket.JSON.Receive(ws, &frame)
-    Check(err)
+    websocket.JSON.Receive(ws, &frame)
+    if len(frame) == 0 {
+      continue
+    }
     for _, receiver := range receivers {
-      receiver <- frame
+      select {
+        case receiver <- frame:
+        default:
+      }
     }
   }
 }

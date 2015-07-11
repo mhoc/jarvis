@@ -5,7 +5,7 @@ package config
 
 import (
   "os"
-  log "github.com/Sirupsen/logrus"
+  "github.com/mhoc/jarvis/log"
 )
 
 func SlackAuthToken() string {

@@ -4,7 +4,7 @@ package ws
 import (
   "encoding/json"
   "github.com/mhoc/jarvis/config"
-  log "github.com/Sirupsen/logrus"
+  "github.com/mhoc/jarvis/log"
   "golang.org/x/net/websocket"
   "io/ioutil"
   "net/http"
@@ -41,6 +41,6 @@ func CreateWebsocket(url string) *websocket.Conn {
 
 func Check(e error) {
   if e != nil {
-    log.Fatal(e)
+    log.Fatal(e.Error())
   }
 }

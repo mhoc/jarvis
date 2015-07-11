@@ -11,6 +11,7 @@ deps:
 	go get github.com/Sirupsen/logrus
 	go get gopkg.in/yaml.v2
 	go get golang.org/x/net/websocket
+	go get github.com/mhoc/golor
 
 config: config/dynamic.go config/env.go config/yaml.go
 

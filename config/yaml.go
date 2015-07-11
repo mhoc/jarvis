@@ -4,7 +4,7 @@ package config
 import (
   "gopkg.in/yaml.v2"
   "io/ioutil"
-  log "github.com/Sirupsen/logrus"
+  "github.com/mhoc/jarvis/log"
 )
 
 var ConfigFile struct {
