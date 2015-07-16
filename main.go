@@ -13,7 +13,7 @@ func main() {
   log.Info("Starting Jarvis")
   runtime.GOMAXPROCS(runtime.NumCPU())
   config.VerifyEnvs()
-  config.Load()
+  config.LoadYaml()
   ws.Init()
   handlers.Init()
   log.Info("Jarvis is live and receiving messages")

@@ -26,5 +26,6 @@ func (s Status) Description() string {
 }
 
 func (s Status) Execute(m util.IncomingSlackMessage) {
-  ws.SendMessage("Im here", m.Channel)
+  response := "Jarvis, at your service."
+  ws.SendMessage(response, m.Channel)
 }

@@ -1,16 +1,8 @@
-// Root handler/dispatcher for all "commands" from slack.
-// Commands are anything of the form
-//    jarvis {ACTION} {arguments}
-// Examples
-//    jarvis PING www.google.com
-//    jarvis LOVE mikehock
-//    jarvis GIF cats
-//    jarvis GOOGLE weird fetish porn
-//    jarvis YOUTUBE Rick Astley
 
 package handlers
 
 import (
+  "fmt"
   "github.com/jbrukh/bayesian"
   "github.com/mhoc/jarvis/commands"
   "github.com/mhoc/jarvis/log"
@@ -52,7 +44,9 @@ func BeginCommandLoop() {
       continue
     }
     cmd := MatchCommand(msg.Text)
-    go cmd.Execute(msg)
+    if cmd != nil {
+      go cmd.Execute(msg)
+    }
   }
 }
 
@@ -64,6 +58,11 @@ func IsCommand(text string) bool {
 }
 
 func MatchCommand(text string) util.Command {
-  _, likely, _ := Classifier.LogScores(strings.Split(text, " "))
-  return commandManifest[likely]
+  scores, likely, _ := Classifier.ProbScores(strings.Split(text, " "))
+  if scores[likely] > 0.90 {
+    return commandManifest[likely]
+  } else {
+    log.Trace(fmt.Sprintf("Command '%v' fell below confidence threshold, ignoring", text))
+    return nil
+  }
 }

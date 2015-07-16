@@ -7,24 +7,24 @@ import (
   "github.com/mhoc/jarvis/ws"
 )
 
-type Help struct {}
-const HelpClass bayesian.Class = "help"
+type Know struct {}
+const KnowClass bayesian.Class = "know"
 
-func (h Help) Class() bayesian.Class {
-  return HelpClass
+func (k Know) Class() bayesian.Class {
+  return KnowClass
 }
 
-func (h Help) TrainingStrings() []string {
+func (k Know) TrainingStrings() []string {
   return []string{
-    "help",
+    "know that",
   }
 }
 
-func (h Help) Description() string {
-  return "Prints some very helpful help text."
+func (k Know) Description() string {
+  return "Tells jarvis some very helpful information about yourself."
 }
 
-func (h Help) Execute(m util.IncomingSlackMessage) {
+func (k Know) Execute(m util.IncomingSlackMessage) {
   response := "My help functionality is a bit underdeveloped at the moment.\n"
   response += "Check out github.com/mhoc/jarvis for more information."
   ws.SendMessage(response, m.Channel)

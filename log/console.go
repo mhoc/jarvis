@@ -21,6 +21,10 @@ func Info(s string) {
   fmt.Printf("%v%v\n", FormatColor(Prefix(), BOLD_GREEN), s)
 }
 
+func Warn(s string) {
+  fmt.Printf("%v%v\n", FormatColor(Prefix(), YELLOW), s)
+}
+
 func Fatal(s string) {
   fmt.Printf("%v%v\n", FormatColor(Prefix(), BOLD_RED), s)
   os.Exit(1)

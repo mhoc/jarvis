@@ -9,7 +9,11 @@ import (
 )
 
 func SendMessage(message string, channelId string) {
-  log.Trace(fmt.Sprintf("Writing message '%v' to channel '%v'", message, channelId))
+  if len(message) > 25 {
+    log.Trace(fmt.Sprintf("Writing message '%v...' to channel '%v'", message[:24], channelId))
+  } else {
+    log.Trace(fmt.Sprintf("Writing message '%v' to channel '%v'", message, channelId))
+  }
   msg := util.OutgoingSlackMessage{
     Channel: channelId,
     Text: message,

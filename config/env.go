@@ -8,17 +8,27 @@ import (
   "github.com/mhoc/jarvis/log"
 )
 
+var ExpectedEnvs = []string{
+  "SLACK_AUTH_TOKEN",
+  "DARK_SKY_API_TOKEN",
+  "ZIP_CODE_API_TOKEN",
+}
+
 func VerifyEnvs() {
-  s := os.Getenv("SLACK_AUTH_TOKEN")
-  if s == "" {
-    log.Fatal("Must provide a slack auth token under the envvar SLACK_AUTH_TOKEN")
+  for _, env := range ExpectedEnvs {
+    s := os.Getenv(env)
+    if s == "" {
+        log.Fatal("Expected environment variable under $" + env)
+    }
   }
 }
 
 func SlackAuthToken() string {
-  auth := os.Getenv("SLACK_AUTH_TOKEN")
-  if auth == "" {
-    log.Fatal("Must provide a slack auth token under the envvar SLACK_AUTH_TOKEN")
-  }
-  return auth
+  return os.Getenv("SLACK_AUTH_TOKEN")
+}
+func DarkSkyAPIToken() string {
+  return os.Getenv("DARK_SKY_API_TOKEN")
+}
+func ZipCodeAPIToken() string {
+  return os.Getenv("ZIP_CODE_API_TOKEN")
 }
