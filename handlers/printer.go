@@ -4,20 +4,21 @@ package handlers
 import (
   "fmt"
   "github.com/mhoc/jarvis/log"
+  "github.com/mhoc/jarvis/service"
   "github.com/mhoc/jarvis/ws"
 )
 
-var ch = make(chan map[string]interface{})
+var printCh = make(chan map[string]interface{})
 
 func InitPrinter() {
-  log.Info("Registering message logging receiver")
-  ws.SubscribeToAll(ch)
+  log.Info("Registering message printing receiver")
+  ws.SubscribeToAll(printCh)
   go BeginPrintLoop()
 }
 
 func BeginPrintLoop() {
   for {
-    msg := <-ch
+    msg := <-printCh
     switch msg["type"] {
     case "message":
       PrintMessage(msg)
@@ -26,5 +27,7 @@ func BeginPrintLoop() {
 }
 
 func PrintMessage(msg map[string]interface{}) {
-  log.Info(fmt.Sprintf("%v: %v\n", msg["user"], msg["text"]))
+  slack := service.Slack{}
+  userName := slack.UserNameFromUserId(msg["user"].(string))
+  log.Info(fmt.Sprintf("%v: %v", userName, msg["text"]))
 }

@@ -12,4 +12,6 @@ type IncomingSlackMessage struct {
 type OutgoingSlackMessage struct {
   Channel string `json:"channel"`
   Text string `json:"text"`
+  Type string `json:"type"`
+  Id int `json:"id"`
 }

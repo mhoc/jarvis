@@ -11,12 +11,13 @@ import (
 )
 
 var slackUrl = "https://slack.com/api/rtm.start?token="
+var wsConnection *websocket.Conn
 
 func Init() {
   log.Info("Initializing websocket connection to slack")
   url := GetSlackWsUrl()
-  ws := CreateWebsocket(url)
-  go StartReading(ws)
+  wsConnection = CreateWebsocket(url)
+  go StartReading()
 }
 
 func GetSlackWsUrl() string {

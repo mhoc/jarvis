@@ -10,7 +10,8 @@ jarvis: deps main.go config.yaml config handlers log ws
 deps:
 	go get gopkg.in/yaml.v2
 	go get golang.org/x/net/websocket
-	go get github.com/mhoc/golor
+	go get github.com/boltdb/bolt
+	go get github.com/jbrukh/bayesian
 
 config: config/env.go config/yaml.go
 

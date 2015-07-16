@@ -10,11 +10,11 @@ import (
 var allReceivers = make([]chan map[string]interface{}, 0)
 var msgReceivers = make([]chan util.IncomingSlackMessage, 0)
 
-func StartReading(ws *websocket.Conn) {
+func StartReading() {
   log.Info("Beginning read loop on websocket")
   for {
     frame := make(map[string]interface{})
-    websocket.JSON.Receive(ws, &frame)
+    websocket.JSON.Receive(wsConnection, &frame)
     if len(frame) == 0 {
       continue
     }
