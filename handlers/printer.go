@@ -9,13 +9,13 @@ import (
 
 var ch = make(chan map[string]interface{})
 
-func Init() {
+func InitPrinter() {
   log.Info("Registering message logging receiver")
-  ws.RegisterMsgReceiver(ch)
-  go ReadMessage()
+  ws.SubscribeToAll(ch)
+  go BeginPrintLoop()
 }
 
-func ReadMessage() {
+func BeginPrintLoop() {
   for {
     msg := <-ch
     switch msg["type"] {

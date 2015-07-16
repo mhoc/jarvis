@@ -12,6 +12,7 @@ import (
 func main() {
   log.Info("Starting Jarvis")
   runtime.GOMAXPROCS(runtime.NumCPU())
+  config.VerifyEnvs()
   config.Load()
   ws.Init()
   handlers.Init()

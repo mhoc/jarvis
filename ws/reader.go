@@ -3,10 +3,12 @@ package ws
 
 import (
   "github.com/mhoc/jarvis/log"
+  "github.com/mhoc/jarvis/util"
   "golang.org/x/net/websocket"
 )
 
-var receivers = make([]chan map[string]interface{}, 0)
+var allReceivers = make([]chan map[string]interface{}, 0)
+var msgReceivers = make([]chan util.IncomingSlackMessage, 0)
 
 func StartReading(ws *websocket.Conn) {
   log.Info("Beginning read loop on websocket")
@@ -16,15 +18,46 @@ func StartReading(ws *websocket.Conn) {
     if len(frame) == 0 {
       continue
     }
-    for _, receiver := range receivers {
-      select {
-        case receiver <- frame:
-        default:
-      }
+    go Dispatch(frame)
+  }
+}
+
+func Dispatch(msg map[string]interface{}) {
+  DispatchAll(msg)
+  if msg["type"] == "message" {
+    msgStruct := util.IncomingSlackMessage{
+      Type: msg["type"].(string),
+      Channel: msg["channel"].(string),
+      User: msg["user"].(string),
+      Text: msg["text"].(string),
+      Timestamp: msg["ts"].(string),
+    }
+    DispatchMessage(msgStruct)
+  }
+}
+
+func DispatchAll(msg map[string]interface{}) {
+  for _, receiver := range allReceivers {
+    select {
+    case receiver <- msg:
+    default:
     }
   }
 }
 
-func RegisterMsgReceiver(c chan map[string]interface{}) {
-  receivers = append(receivers, c)
+func DispatchMessage(msg util.IncomingSlackMessage) {
+  for _, receiver := range msgReceivers {
+    select {
+    case receiver <- msg:
+    default:
+    }
+  }
+}
+
+func SubscribeToAll(c chan map[string]interface{}) {
+  allReceivers = append(allReceivers, c)
+}
+
+func SubscribeToMessages(c chan util.IncomingSlackMessage) {
+  msgReceivers = append(msgReceivers, c)
 }

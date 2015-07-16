@@ -8,6 +8,13 @@ import (
   "github.com/mhoc/jarvis/log"
 )
 
+func VerifyEnvs() {
+  s := os.Getenv("SLACK_AUTH_TOKEN")
+  if s == "" {
+    log.Fatal("Must provide a slack auth token under the envvar SLACK_AUTH_TOKEN")
+  }
+}
+
 func SlackAuthToken() string {
   auth := os.Getenv("SLACK_AUTH_TOKEN")
   if auth == "" {
