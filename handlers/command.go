@@ -2,7 +2,6 @@
 package handlers
 
 import (
-  "fmt"
   "github.com/jbrukh/bayesian"
   "github.com/mhoc/jarvis/commands"
   "github.com/mhoc/jarvis/log"
@@ -13,6 +12,7 @@ import (
 
 var commandManifest = []util.Command{
   commands.Help{},
+  commands.Know{},
   commands.Status{},
 }
 
@@ -51,18 +51,16 @@ func BeginCommandLoop() {
 }
 
 func IsCommand(text string) bool {
-  if !strings.HasPrefix(text, "jarvis") && !strings.HasPrefix(text, "Jarvis") {
-    return false
+  if strings.Contains(text, "jarvis") {
+    return true
   }
-  return true
+  if strings.Contains(text, "Jarvis") {
+    return true
+  }
+  return false
 }
 
 func MatchCommand(text string) util.Command {
-  scores, likely, _ := Classifier.ProbScores(strings.Split(text, " "))
-  if scores[likely] > 0.90 {
-    return commandManifest[likely]
-  } else {
-    log.Trace(fmt.Sprintf("Command '%v' fell below confidence threshold, ignoring", text))
-    return nil
-  }
+  _, likely, _ := Classifier.ProbScores(strings.Split(text, " "))
+  return commandManifest[likely]
 }

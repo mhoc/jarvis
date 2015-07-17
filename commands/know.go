@@ -2,9 +2,13 @@
 package commands
 
 import (
+  "fmt"
+  "github.com/boltdb/bolt"
   "github.com/jbrukh/bayesian"
+  "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
+  "strings"
 )
 
 type Know struct {}
@@ -16,7 +20,7 @@ func (k Know) Class() bayesian.Class {
 
 func (k Know) TrainingStrings() []string {
   return []string{
-    "know that",
+    "know",
   }
 }
 
@@ -25,7 +29,35 @@ func (k Know) Description() string {
 }
 
 func (k Know) Execute(m util.IncomingSlackMessage) {
-  response := "My help functionality is a bit underdeveloped at the moment.\n"
-  response += "Check out github.com/mhoc/jarvis for more information."
-  ws.SendMessage(response, m.Channel)
+  knowSplit := strings.Split(m.Text, "is ")
+  fmt.Printf("%v\n", knowSplit)
+  if len(knowSplit) != 3 {
+    ws.SendMessage("Please put what you want me to know after the word 'is' in your request.", m.Channel)
+    return
+  }
+
+  knowWhat := knowSplit[2]
+  var knowThat string
+
+  if strings.Contains(m.Text, "zip code") || strings.Contains(m.Text, "zipcode") {
+    knowThat = "zip code"
+  } else {
+    ws.SendMessage("I'm not totally sure what you're trying to tell me to know.", m.Channel)
+    return
+  }
+
+  db, err := bolt.Open(config.BoltDBPath(), 0600, nil)
+  util.Check(err)
+  defer db.Close()
+
+  key := []byte(m.User + "_" + strings.Replace(knowThat, " ", "_", -1))
+  value := []byte(knowWhat)
+
+  db.Update(func(tx *bolt.Tx) error {
+    bucket, _ := tx.CreateBucketIfNotExists([]byte(k.Class()))
+    bucket.Put(key, value)
+    return nil
+  })
+
+  ws.SendMessage(fmt.Sprintf("No problem. I now know that your %v is %v.", knowThat, knowWhat), m.Channel)
 }
