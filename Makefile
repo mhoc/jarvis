@@ -1,10 +1,25 @@
 
-all:
-	npm install
-	npm start
+run: build
+	./jarvis
 
-test:
-	npm test
+build: jarvis
 
-tree:
-	@tree -I node_modules -AC
+jarvis: deps main.go config.yaml config handlers log ws
+	go build github.com/mhoc/jarvis
+
+deps:
+	go get gopkg.in/yaml.v2
+	go get golang.org/x/net/websocket
+	go get github.com/boltdb/bolt
+	go get github.com/jbrukh/bayesian
+
+config: config/env.go config/yaml.go
+
+handlers: handlers/printer.go
+
+log: log/console.go
+
+ws: ws/reader.go ws/ws.go
+
+clean:
+	rm jarvis
