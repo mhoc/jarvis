@@ -5,6 +5,7 @@ import (
   "encoding/json"
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
+  "github.com/mhoc/jarvis/util"
   "golang.org/x/net/websocket"
   "io/ioutil"
   "net/http"
@@ -25,23 +26,23 @@ func GetSlackWsUrl() string {
   slackAuth := config.SlackAuthToken()
   slackUrl += slackAuth
   resIo, err := http.Get(slackUrl)
-  Check(err)
+  util.Check(err)
   resb, err := ioutil.ReadAll(resIo.Body)
-  Check(err)
+  util.Check(err)
   var data map[string]interface{}
   err = json.Unmarshal(resb, &data)
-  Check(err)
+  util.Check(err)
+  StoreJarvisUserId(data)
   return data["url"].(string)
 }
 
 func CreateWebsocket(url string) *websocket.Conn {
   ws, err := websocket.Dial(url, "", "http://localhost/")
-  Check(err)
+  util.Check(err)
   return ws
 }
 
-func Check(e error) {
-  if e != nil {
-    log.Fatal(e.Error())
-  }
+func StoreJarvisUserId(data map[string]interface{}) {
+  jarvisId := data["self"].(map[string]interface{})["id"].(string)
+  config.OtherConf.JarvisUserId = jarvisId
 }

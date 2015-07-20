@@ -3,6 +3,7 @@ package commands
 
 import (
   "github.com/jbrukh/bayesian"
+  "github.com/mhoc/jarvis/service"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
 )
@@ -26,6 +27,8 @@ func (s Status) Description() string {
 }
 
 func (s Status) Execute(m util.IncomingSlackMessage) {
-  response := "Jarvis, at your service."
+  response := "Jarvis, at your service.\n"
+  version := service.Git{}.LastCommitId()
+  response += "I'm running version " + version + "."
   ws.SendMessage(response, m.Channel)
 }

@@ -2,6 +2,7 @@
 package ws
 
 import (
+  "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "golang.org/x/net/websocket"
@@ -16,6 +17,10 @@ func StartReading() {
     frame := make(map[string]interface{})
     websocket.JSON.Receive(wsConnection, &frame)
     if len(frame) == 0 {
+      continue
+    }
+    if sender, in := frame["user"]; in && sender == config.JarvisUserId() {
+      log.Trace("Ignoring message sent by jarvis")
       continue
     }
     go Dispatch(frame)
