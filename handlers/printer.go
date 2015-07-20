@@ -27,7 +27,7 @@ func BeginPrintLoop() {
 }
 
 func PrintMessage(msg map[string]interface{}) {
-  slack := service.Slack{}
+  slack := service.Slack()
   userName := slack.UserNameFromUserId(msg["user"].(string))
   log.Info(fmt.Sprintf("%v: %v", userName, msg["text"]))
 }

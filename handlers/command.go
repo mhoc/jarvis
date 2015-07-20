@@ -12,7 +12,6 @@ import (
 
 var commandManifest = []util.Command{
   commands.Help{},
-  commands.Know{},
   commands.Status{},
 }
 

@@ -9,6 +9,7 @@ import (
 
 var ConfigFile struct {
   Admins []string `json:"admins"`
+  Location string `json:"location"`
 }
 const ConfigLocation = "config.yaml"
 
@@ -33,8 +34,15 @@ func ValidateYaml() {
   if len(ConfigFile.Admins) == 0 {
     log.Warn("Admin level commands will be unavailable if no admins are provided in config.yaml")
   }
+  if ConfigFile.Location == "" {
+    log.Fatal("Must provide a human readable location name for where jarvis is running in config.yaml")
+  }
 }
 
 func Admins() []string {
   return ConfigFile.Admins
+}
+
+func Location() string {
+  return ConfigFile.Location
 }

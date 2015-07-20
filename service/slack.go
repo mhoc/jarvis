@@ -11,11 +11,20 @@ import (
   "net/http"
 )
 
-type Slack struct {}
-var slackCachedUserIds = make(map[string]string)
+type SlackService struct {
+  cachedUserIds map[string]string
+}
+var GlobalSlackService *SlackService
 
-func (s Slack) UserNameFromUserId(userId string) string {
-  if userName, in := slackCachedUserIds[userId]; in {
+func Slack() *SlackService {
+  if GlobalSlackService == nil {
+    GlobalSlackService = &SlackService{cachedUserIds: make(map[string]string)}
+  }
+  return GlobalSlackService
+}
+
+func (s SlackService) UserNameFromUserId(userId string) string {
+  if userName, in := s.cachedUserIds[userId]; in {
     return userName
   }
   log.Trace(fmt.Sprintf("Contacting slack to convert %v to username", userId))
@@ -27,6 +36,6 @@ func (s Slack) UserNameFromUserId(userId string) string {
   var data map[string]interface{}
   err = json.Unmarshal(resb, &data)
   util.Check(err)
-  slackCachedUserIds[userId] = data["user"].(map[string]interface{})["name"].(string)
-  return slackCachedUserIds[userId]
+  s.cachedUserIds[userId] = data["user"].(map[string]interface{})["name"].(string)
+  return s.cachedUserIds[userId]
 }
