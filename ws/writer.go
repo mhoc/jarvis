@@ -2,10 +2,11 @@
 package ws
 
 import (
+  "encoding/json"
   "fmt"
+  "github.com/gorilla/websocket"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
-  "golang.org/x/net/websocket"
 )
 
 func SendMessage(message string, channelId string) {
@@ -20,5 +21,7 @@ func SendMessage(message string, channelId string) {
     Type: "message",
     Id: 1,
   }
-  websocket.JSON.Send(wsConnection, msg)
+  json, err := json.Marshal(msg)
+  util.Check(err)
+  wsConnection.WriteMessage(websocket.TextMessage, json)
 }

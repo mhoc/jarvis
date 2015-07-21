@@ -12,6 +12,7 @@ deps:
 	go get golang.org/x/net/websocket
 	go get github.com/boltdb/bolt
 	go get github.com/jbrukh/bayesian
+	go get github.com/gorilla/websocket
 
 config: config/env.go config/yaml.go
 

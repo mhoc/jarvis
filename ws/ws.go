@@ -3,26 +3,31 @@ package ws
 
 import (
   "encoding/json"
+  "github.com/gorilla/websocket"
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
-  "golang.org/x/net/websocket"
   "io/ioutil"
+  "net"
   "net/http"
+  "net/url"
 )
 
-var slackUrl = "https://slack.com/api/rtm.start?token="
-var wsConnection *websocket.Conn
+var (
+  wsConnection *websocket.Conn
+  slackUrl = "https://slack.com/api/rtm.start?token="
+)
 
 func Init() {
   log.Info("Initializing websocket connection to slack")
-  url := GetSlackWsUrl()
-  wsConnection = CreateWebsocket(url)
+  u, err := url.Parse(GetSlackWsUrl())
+  util.Check(err)
+  wsConnection = CreateWebsocket(u)
   go StartReading()
 }
 
 func GetSlackWsUrl() string {
-  log.Info("Getting slack websocket url")
+  log.Trace("Getting slack websocket url")
   slackAuth := config.SlackAuthToken()
   slackUrl += slackAuth
   resIo, err := http.Get(slackUrl)
@@ -36,10 +41,17 @@ func GetSlackWsUrl() string {
   return data["url"].(string)
 }
 
-func CreateWebsocket(url string) *websocket.Conn {
-  ws, err := websocket.Dial(url, "", "http://localhost/")
+func CreateWebsocket(u *url.URL) *websocket.Conn {
+  log.Trace("Creating websocket")
+  rawConn, err := net.Dial("tcp", u.Host)
   util.Check(err)
-  return ws
+  wsHeaders := http.Header{
+    "Origin": { "http://localhost/"},
+    "Sec-Websocket-Extensions": { "permessage-deflate; client_max_window_bits, x-webkit-deflate-frame" },
+  }
+  wsConnection, _, err := websocket.NewClient(rawConn, u, wsHeaders, 16384, 16384)
+  util.Check(err)
+  return wsConnection
 }
 
 func StoreJarvisUserId(data map[string]interface{}) {
