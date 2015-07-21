@@ -1,10 +1,6 @@
 
 package config
 
-import (
-
-)
-
 var OtherConf struct {
   JarvisUserId string
 }

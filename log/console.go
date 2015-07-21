@@ -13,19 +13,19 @@ func Prefix() string {
   return pre
 }
 
-func Trace(s string) {
-  fmt.Printf("%v\n", FormatColor(Prefix() + s, BOLD_GRAY))
+func Trace(s string, args ...interface{}) {
+  fmt.Printf(fmt.Sprintf("%v\n", FormatColor(Prefix() + s, BOLD_GRAY)), args...)
 }
 
-func Info(s string) {
-  fmt.Printf("%v%v\n", FormatColor(Prefix(), BOLD_GREEN), s)
+func Info(s string, args ...interface{}) {
+  fmt.Printf(fmt.Sprintf("%v%v\n", FormatColor(Prefix(), BOLD_GREEN), s), args...)
 }
 
-func Warn(s string) {
-  fmt.Printf("%v%v\n", FormatColor(Prefix(), YELLOW), s)
+func Warn(s string, args ...interface{}) {
+  fmt.Printf(fmt.Sprintf("%v%v\n", FormatColor(Prefix(), YELLOW), s), args...)
 }
 
-func Fatal(s string) {
-  fmt.Printf("%v\n", FormatColor(Prefix() + s, BOLD_RED))
+func Fatal(s string, args ...interface{}) {
+  fmt.Printf(fmt.Sprintf("%v\n", FormatColor(Prefix() + s, BOLD_RED)), args...)
   os.Exit(1)
 }

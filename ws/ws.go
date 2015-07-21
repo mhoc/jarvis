@@ -3,12 +3,10 @@ package ws
 
 import (
   "crypto/tls"
-  "encoding/json"
   "github.com/gorilla/websocket"
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
-  "io/ioutil"
   "net/http"
   "net/url"
 )
@@ -30,13 +28,7 @@ func GetSlackWsUrl() string {
   log.Trace("Getting slack websocket url")
   slackAuth := config.SlackAuthToken()
   slackUrl += slackAuth
-  resIo, err := http.Get(slackUrl)
-  util.Check(err)
-  resb, err := ioutil.ReadAll(resIo.Body)
-  util.Check(err)
-  var data map[string]interface{}
-  err = json.Unmarshal(resb, &data)
-  util.Check(err)
+  data := util.HttpGet(slackUrl)
   StoreJarvisUserId(data)
   return data["url"].(string)
 }

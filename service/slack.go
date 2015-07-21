@@ -2,13 +2,10 @@
 package service
 
 import (
-  "encoding/json"
   "fmt"
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
-  "io/ioutil"
-  "net/http"
 )
 
 type SlackService struct {
@@ -25,17 +22,12 @@ func Slack() *SlackService {
 
 func (s SlackService) UserNameFromUserId(userId string) string {
   if userName, in := s.cachedUserIds[userId]; in {
+    log.Trace("Converting cached userId %v", userId)
     return userName
   }
-  log.Trace(fmt.Sprintf("Contacting slack to convert %v to username", userId))
+  log.Trace("Converting userId %v with slack api call", userId)
   url := fmt.Sprintf("https://slack.com/api/users.info?token=%v&user=%v", config.SlackAuthToken(), userId)
-  res, err := http.Get(url)
-  util.Check(err)
-  resb, err := ioutil.ReadAll(res.Body)
-  util.Check(err)
-  var data map[string]interface{}
-  err = json.Unmarshal(resb, &data)
-  util.Check(err)
+  data := util.HttpGet(url)
   s.cachedUserIds[userId] = data["user"].(map[string]interface{})["name"].(string)
   return s.cachedUserIds[userId]
 }

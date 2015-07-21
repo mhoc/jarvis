@@ -9,8 +9,6 @@ jarvis: deps main.go config.yaml config handlers log ws
 
 deps:
 	go get gopkg.in/yaml.v2
-	go get golang.org/x/net/websocket
-	go get github.com/boltdb/bolt
 	go get github.com/jbrukh/bayesian
 	go get github.com/gorilla/websocket
 
