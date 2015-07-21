@@ -2,13 +2,13 @@
 package ws
 
 import (
+  "crypto/tls"
   "encoding/json"
   "github.com/gorilla/websocket"
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "io/ioutil"
-  "net"
   "net/http"
   "net/url"
 )
@@ -43,11 +43,10 @@ func GetSlackWsUrl() string {
 
 func CreateWebsocket(u *url.URL) *websocket.Conn {
   log.Trace("Creating websocket")
-  rawConn, err := net.Dial("tcp", u.Host)
+  rawConn, err := tls.Dial("tcp", u.Host + ":443", nil)
   util.Check(err)
   wsHeaders := http.Header{
-    "Origin": { "http://localhost/"},
-    "Sec-Websocket-Extensions": { "permessage-deflate; client_max_window_bits, x-webkit-deflate-frame" },
+    "Origin": { "http://localhost/" },
   }
   wsConnection, _, err := websocket.NewClient(rawConn, u, wsHeaders, 16384, 16384)
   util.Check(err)

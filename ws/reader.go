@@ -2,7 +2,8 @@
 package ws
 
 import (
-  // "github.com/mhoc/jarvis/config"
+  "encoding/json"
+  "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
 )
@@ -15,19 +16,20 @@ func StartReading() {
   for {
     _, p, err := wsConnection.ReadMessage()
     util.Check(err)
-    log.Info(string(p))
-  //   if err != nil {
-  //     log.Warn("Websocket read threw an error. Generally this doesn't indicate catastrophic failure.")
-  //     log.Warn(err.Error())
-  //   }
-  //   if len(frame) == 0 {
-  //     continue
-  //   }
-  //   if sender, in := frame["user"]; in && sender == config.JarvisUserId() {
-  //     log.Trace("Ignoring message sent by jarvis")
-  //     continue
-  //   }
-  //   go Dispatch(frame)
+    var frame map[string]interface{}
+    json.Unmarshal(p, &frame)
+    if err != nil {
+      log.Warn("Websocket read threw an error. Generally this doesn't indicate catastrophic failure.")
+      log.Warn(err.Error())
+    }
+    if len(frame) == 0 {
+      continue
+    }
+    if sender, in := frame["user"]; in && sender == config.JarvisUserId() {
+      log.Trace("Ignoring message sent by jarvis")
+      continue
+    }
+    go Dispatch(frame)
   }
 }
 
