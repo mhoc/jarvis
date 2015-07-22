@@ -2,7 +2,6 @@
 package handlers
 
 import (
-  "github.com/jbrukh/bayesian"
   "github.com/mhoc/jarvis/commands"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
@@ -16,24 +15,11 @@ var commandManifest = []util.Command{
 }
 
 var cmdCh = make(chan util.IncomingSlackMessage)
-var Classifier *bayesian.Classifier
 
 func InitCommands() {
   log.Info("Initing command listener")
   ws.SubscribeToMessages(cmdCh)
-  TrainCommandClassifier()
   go BeginCommandLoop()
-}
-
-func TrainCommandClassifier() {
-  classes := []bayesian.Class{}
-  for _, command := range commandManifest {
-    classes = append(classes, command.Class())
-  }
-  Classifier = bayesian.NewClassifier(classes...)
-  for _, command := range commandManifest{
-    Classifier.Learn(command.TrainingStrings(), command.Class())
-  }
 }
 
 func BeginCommandLoop() {
@@ -60,6 +46,12 @@ func IsCommand(text string) bool {
 }
 
 func MatchCommand(text string) util.Command {
-  _, likely, _ := Classifier.ProbScores(strings.Split(text, " "))
-  return commandManifest[likely]
+  for _, command := range commandManifest {
+    for _, match := range command.Matches() {
+      if match.MatchString(text) {
+        return command
+      }
+    }
+  }
+  return nil
 }

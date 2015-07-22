@@ -2,12 +2,11 @@
 package util
 
 import (
-  "github.com/jbrukh/bayesian"
+  "regexp"
 )
 
 type Command interface {
-  Class() bayesian.Class
-  TrainingStrings() []string
+  Matches() []*regexp.Regexp
   Description() string
   Execute(IncomingSlackMessage)
 }

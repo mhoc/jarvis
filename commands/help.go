@@ -2,21 +2,16 @@
 package commands
 
 import (
-  "github.com/jbrukh/bayesian"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
+  "regexp"
 )
 
 type Help struct {}
-const HelpClass bayesian.Class = "help"
 
-func (h Help) Class() bayesian.Class {
-  return HelpClass
-}
-
-func (h Help) TrainingStrings() []string {
-  return []string{
-    "help",
+func (h Help) Matches() []*regexp.Regexp {
+  return []*regexp.Regexp {
+    regexp.MustCompile("help"),
   }
 }
 
