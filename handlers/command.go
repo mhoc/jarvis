@@ -12,6 +12,7 @@ import (
 var commandManifest = []util.Command{
   commands.Help{},
   commands.Status{},
+  commands.Weather{},
 }
 
 var cmdCh = make(chan util.IncomingSlackMessage)

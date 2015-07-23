@@ -17,5 +17,6 @@ func HttpGet(url string) map[string]interface{} {
   var data map[string]interface{}
   err = json.Unmarshal(resB, &data)
   Check(err)
+  // log.Trace("%v\n", data)
   return data
 }
