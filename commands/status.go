@@ -18,8 +18,16 @@ func (s Status) Matches() []*regexp.Regexp {
   }
 }
 
-func (s Status) Description() string {
-  return "Prints my status, with information about my version and where I am hosted."
+func (s Status) Help(m util.IncomingSlackMessage) {
+  message := util.HelpGenerator{
+    CommandName: "status",
+    Description: "prints status information about the jarvis runtime, including the running version and location",
+    RegexMatches: s.Matches(),
+    Format: "jarvis (match)",
+    Examples: []string{"jarvis status"},
+    OtherTopics: []util.HelpGeneratorTopic{},
+  }.Generate()
+  ws.SendMessage(message, m.Channel)
 }
 
 func (s Status) Execute(m util.IncomingSlackMessage) {

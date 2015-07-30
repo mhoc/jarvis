@@ -17,8 +17,16 @@ func (w Weather) Matches() []*regexp.Regexp {
   }
 }
 
-func (w Weather) Description() string {
-  return "Your local weatherman."
+func (w Weather) Help(m util.IncomingSlackMessage) {
+  message := util.HelpGenerator{
+    CommandName: "weather",
+    Description: "provides current weather and weather forcasts through the darksky weather api",
+    RegexMatches: w.Matches(),
+    Format: "jarvis (match) (zipcode)",
+    Examples: []string{"jarvis weather 46723"},
+    OtherTopics: []util.HelpGeneratorTopic{},
+  }.Generate()
+  ws.SendMessage(message, m.Channel)
 }
 
 func (w Weather) Execute(m util.IncomingSlackMessage) {

@@ -7,6 +7,6 @@ import (
 
 type Command interface {
   Matches() []*regexp.Regexp
-  Description() string
+  Help(IncomingSlackMessage)
   Execute(IncomingSlackMessage)
 }
