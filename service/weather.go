@@ -8,19 +8,11 @@ import (
   "github.com/mhoc/jarvis/util"
 )
 
-type WeatherService struct {}
-var GlobalWeatherService *WeatherService
+type Weather struct {}
 
-func Weather() *WeatherService {
-  if GlobalWeatherService == nil {
-    GlobalWeatherService = &WeatherService{}
-  }
-  return GlobalWeatherService
-}
-
-func (w WeatherService) CurrentFriendly(zipcode string) string {
+func (w Weather) CurrentFriendly(zipcode string) string {
   log.Trace("Getting friendly weather report for %v", zipcode)
-  lat, lng := ZipCode().ToLatLng(zipcode)
+  lat, lng := ZipCode{}.ToLatLng(zipcode)
   auth := config.DarkSkyAPIToken()
   url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", auth, lat, lng)
   data := util.HttpGet(url)

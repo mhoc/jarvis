@@ -24,7 +24,7 @@ func (s Status) Description() string {
 
 func (s Status) Execute(m util.IncomingSlackMessage) {
   response := "Jarvis, at your service.\n"
-  version := service.Git().LastTag()
+  version := service.Git{}.LastTag()
   response += "I'm running version " + version
   location := config.Location()
   response += " on " + location + "."

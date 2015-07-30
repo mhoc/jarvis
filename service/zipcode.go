@@ -8,17 +8,9 @@ import (
   "github.com/mhoc/jarvis/util"
 )
 
-type ZipCodeService struct {}
-var GlobalZipCodeService *ZipCodeService
+type ZipCode struct {}
 
-func ZipCode() *ZipCodeService {
-  if GlobalZipCodeService == nil {
-    GlobalZipCodeService = &ZipCodeService{}
-  }
-  return GlobalZipCodeService
-}
-
-func (z ZipCodeService) ToLatLng(zipcode string) (float64, float64) {
+func (z ZipCode) ToLatLng(zipcode string) (float64, float64) {
   log.Trace("Converting %v to lat/lng", zipcode)
   auth := config.ZipCodeAPIToken()
   url := fmt.Sprintf("https://www.zipcodeapi.com/rest/%v/info.json/%v/degrees", auth, zipcode)

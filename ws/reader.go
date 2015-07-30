@@ -19,7 +19,7 @@ func StartReading() {
     var frame map[string]interface{}
     json.Unmarshal(p, &frame)
     if err != nil {
-      log.Warn("Websocket read threw an error. Generally this doesn't indicate catastrophic failure.")
+      log.Warn("Websocket read threw an error.")
       log.Warn(err.Error())
     }
     if len(frame) == 0 {
