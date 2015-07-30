@@ -9,6 +9,7 @@ import (
 )
 
 var ExpectedEnvs = []string{
+  "REDIS_URI",
   "SLACK_AUTH_TOKEN",
   "DARK_SKY_API_TOKEN",
   "ZIP_CODE_API_TOKEN",
@@ -23,6 +24,9 @@ func VerifyEnvs() {
   }
 }
 
+func RedisURI() string {
+  return os.Getenv("REDIS_URI")
+}
 func SlackAuthToken() string {
   return os.Getenv("SLACK_AUTH_TOKEN")
 }

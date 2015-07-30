@@ -10,6 +10,7 @@ jarvis: deps main.go
 deps:
 	go get gopkg.in/yaml.v2
 	go get github.com/gorilla/websocket
-	
+	go get github.com/xuyu/goredis
+
 clean:
 	rm jarvis

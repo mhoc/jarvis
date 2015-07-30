@@ -17,5 +17,5 @@ func main() {
   ws.Init()
   handlers.Init()
   log.Info("Jarvis is live and receiving messages")
-  for {}
+  select {}
 }
