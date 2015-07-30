@@ -16,9 +16,9 @@ const (
 )
 
 func (s Slack) UserNameFromUserId(userId string) string {
-  log.Trace("Converting userId %v with slack api call", userId)
   in, un := data.GetCache(SLACK_CACHE_UN_FROM_UID_PREFIX + userId)
   if !in {
+    log.Trace("Converting userId %v with slack api call", userId)
     url := fmt.Sprintf("https://slack.com/api/users.info?token=%v&user=%v", config.SlackAuthToken(), userId)
     slackData := util.HttpGet(url)
     un = slackData["user"].(map[string]interface{})["name"].(string)

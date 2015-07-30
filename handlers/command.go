@@ -11,6 +11,7 @@ import (
 
 var commandManifest = []util.Command{
   commands.Help{},
+  commands.Remember{},
   commands.Status{},
   commands.Weather{},
 }
