@@ -24,6 +24,10 @@ func (w Weather) Description() string {
 func (w Weather) Execute(m util.IncomingSlackMessage) {
   zipCodeRegex := regexp.MustCompile("[0-9]{5}")
   zipCode := string(zipCodeRegex.Find([]byte(m.Text)))
-  weather := service.Weather{}.CurrentFriendly(zipCode)
-  ws.SendMessage(weather, m.Channel)
+  if zipCode == "" {
+    ws.SendMessage("You should probably provide a zipcode", m.Channel)
+  } else {
+    weather := service.Weather{}.ForecastFriendly(zipCode)
+    ws.SendMessage(weather, m.Channel)
+  }
 }

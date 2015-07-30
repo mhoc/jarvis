@@ -13,7 +13,7 @@ func Cache(key string, val string) {
     conn := RedisConn()
     err := conn.Set(key, val, 0, 0, false, false)
     util.Check(err)
-  }
+  }()
 }
 
 func CacheTimeout(key string, val string, timeout time.Duration) {
@@ -22,7 +22,7 @@ func CacheTimeout(key string, val string, timeout time.Duration) {
     conn := RedisConn()
     err := conn.Set(key, val, int(timeout.Seconds()), 0, false, false)
     util.Check(err)
-  }
+  }()
 }
 
 func GetCache(key string) (bool, string) {
