@@ -5,6 +5,7 @@ import (
   "crypto/tls"
   "github.com/gorilla/websocket"
   "github.com/mhoc/jarvis/config"
+  "github.com/mhoc/jarvis/data"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "net/http"
@@ -45,7 +46,7 @@ func CreateWebsocket(u *url.URL) *websocket.Conn {
   return wsConnection
 }
 
-func StoreJarvisUserId(data map[string]interface{}) {
-  jarvisId := data["self"].(map[string]interface{})["id"].(string)
-  config.OtherConf.JarvisUserId = jarvisId
+func StoreJarvisUserId(d map[string]interface{}) {
+  jarvisId := d["self"].(map[string]interface{})["id"].(string)
+  data.Cache("jarvis-user-id", jarvisId)
 }

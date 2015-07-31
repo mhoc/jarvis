@@ -3,7 +3,7 @@ package ws
 
 import (
   "encoding/json"
-  "github.com/mhoc/jarvis/config"
+  "github.com/mhoc/jarvis/data"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
 )
@@ -25,7 +25,8 @@ func StartReading() {
     if len(frame) == 0 {
       continue
     }
-    if sender, in := frame["user"]; in && sender == config.JarvisUserId() {
+    _, jarvisUserId := data.GetCache("jarvis-user-id")
+    if sender, in := frame["user"]; in && sender == jarvisUserId {
       log.Trace("Ignoring message sent by jarvis")
       continue
     }
