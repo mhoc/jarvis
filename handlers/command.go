@@ -29,7 +29,7 @@ func InitCommands() {
 func BeginCommandLoop() {
   for {
     msg := <-cmdCh
-    if !IsCommand(msg.Text) {
+    if !IsCommand(msg) {
       continue
     }
     cmd := MatchCommand(msg)
@@ -39,14 +39,18 @@ func BeginCommandLoop() {
   }
 }
 
-func IsCommand(text string) bool {
-  if strings.Contains(text, "help") {
+func IsCommand(msg util.IncomingSlackMessage) bool {
+  if strings.Contains(msg.Text, "help") {
     return false
   }
-  if strings.Contains(text, "jarvis") {
+  if strings.Contains(msg.Text, "jarvis") {
     return true
   }
-  if strings.Contains(text, "Jarvis") {
+  if strings.Contains(msg.Text, "Jarvis") {
+    return true
+  }
+  if strings.Contains(msg.Text, "jarivs") {
+    ws.SendMessage("Dude, you can't even spell my name right? Whatever.", msg.Channel)
     return true
   }
   return false

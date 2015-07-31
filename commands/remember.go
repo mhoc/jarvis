@@ -1,4 +1,6 @@
 
+// Remember is the command interface into datum storage
+
 package commands
 
 import (
@@ -10,22 +12,7 @@ import (
   "strings"
 )
 
-type (
-  Remember struct {}
-  RememberKey struct {
-    Key string
-    Aliases []string
-  }
-)
-
-var (
-  RememberKeys = []RememberKey{
-    RememberKey{
-      Key: "user-zipcode-",
-      Aliases: []string{"zipcode", "zip code", "zip"},
-    },
-  }
-)
+type Remember struct {}
 
 func (r Remember) Name() string {
   return "remember"
@@ -34,6 +21,7 @@ func (r Remember) Name() string {
 func (r Remember) Matches() []*regexp.Regexp {
   return []*regexp.Regexp {
     regexp.MustCompile("remember"),
+    regexp.MustCompile("know"),
   }
 }
 
@@ -42,7 +30,7 @@ func (r Remember) Description() string {
 }
 
 func (r Remember) Format() string {
-  return "jarvis (match) .* (data key) is (data value)"
+  return "jarvis (match) that (data key) is (data value)"
 }
 
 func (r Remember) Examples() []string {
@@ -50,14 +38,19 @@ func (r Remember) Examples() []string {
 }
 
 func (r Remember) Execute(m util.IncomingSlackMessage) {
-  key, datum := r.GetRememberKeyDatum(m.Text)
-  if key == nil {
+  regex := util.NewRegex("that (.+) is (.+)")
+  if !regex.Matches(m.Text) {
+    ws.SendMessage("I can't parse your query. I'm sorry I can't live up to your expectations daddy.", m.Channel)
+    return
+  }
+  key, value := regex.SubExpression(m.Text, 0), regex.SubExpression(m.Text, 1)
+  success := data.StoreDatum(key, value, m.User)
+  if !success {
     ws.SendMessage("I don't recognize the type of data you're asking me to remember.", m.Channel)
     return
   }
-  data.Cache(key.Key + m.User, datum)
-  message := fmt.Sprintf("Alright. I'll remember that your %v is '%v'.", key.Aliases[0], datum)
-  ws.SendMessage(message, m.Channel)
+  key = strings.Replace(key, "my", "your", -1)
+  ws.SendMessage(fmt.Sprintf("Alright. I'll remember that %v is %v.", key, value), m.Channel)
 }
 
 func (r Remember) Help(m util.IncomingSlackMessage) {
@@ -75,18 +68,4 @@ func (r Remember) Help(m util.IncomingSlackMessage) {
     },
   }.Generate()
   ws.SendMessage(message, m.Channel)
-}
-
-func (r Remember) GetRememberKeyDatum(text string) (*RememberKey, string) {
-  for _, key := range RememberKeys {
-    for _, alias := range key.Aliases {
-      alias += " is "
-      index := strings.Index(text, alias)
-      if index > -1 {
-        text = text[index+len(alias):]
-        return &key, text
-      }
-    }
-  }
-  return nil, ""
 }
