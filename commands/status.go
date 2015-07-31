@@ -11,6 +11,10 @@ import (
 
 type Status struct {}
 
+func (s Status) Name() string {
+  return "status"
+}
+
 func (s Status) Matches() []*regexp.Regexp {
   return []*regexp.Regexp{
     regexp.MustCompile("status"),
@@ -18,16 +22,16 @@ func (s Status) Matches() []*regexp.Regexp {
   }
 }
 
-func (s Status) Help(m util.IncomingSlackMessage) {
-  message := util.HelpGenerator{
-    CommandName: "status",
-    Description: "prints status information about the jarvis runtime, including the running version and location",
-    RegexMatches: s.Matches(),
-    Format: "jarvis (match)",
-    Examples: []string{"jarvis status"},
-    OtherTopics: []util.HelpGeneratorTopic{},
-  }.Generate()
-  ws.SendMessage(message, m.Channel)
+func (s Status) Description() string {
+  return "prints status information about the jarvis runtime, including the running version and location"
+}
+
+func (s Status) Format() string {
+  return "jarvis (match)"
+}
+
+func (s Status) Examples() []string {
+  return []string{"jarvis status"}
 }
 
 func (s Status) Execute(m util.IncomingSlackMessage) {
@@ -37,4 +41,16 @@ func (s Status) Execute(m util.IncomingSlackMessage) {
   location := config.Location()
   response += " on " + location + "."
   ws.SendMessage(response, m.Channel)
+}
+
+func (s Status) Help(m util.IncomingSlackMessage) {
+  message := util.HelpGenerator{
+    CommandName: s.Name(),
+    Description: s.Description(),
+    RegexMatches: s.Matches(),
+    Format: s.Format(),
+    Examples: s.Examples(),
+    OtherTopics: []util.HelpGeneratorTopic{},
+  }.Generate()
+  ws.SendMessage(message, m.Channel)
 }

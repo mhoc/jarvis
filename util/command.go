@@ -6,7 +6,16 @@ import (
 )
 
 type Command interface {
+  Name() string
   Matches() []*regexp.Regexp
-  Help(IncomingSlackMessage)
+
+  // For documentation purposes
+  Description() string
+  Format() string
+  Examples() []string
+
+  // Behavior
   Execute(IncomingSlackMessage)
+  Help(IncomingSlackMessage)
+
 }

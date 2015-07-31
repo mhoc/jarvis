@@ -10,6 +10,10 @@ import (
 
 type Weather struct {}
 
+func (w Weather) Name() string {
+  return "weather"
+}
+
 func (w Weather) Matches() []*regexp.Regexp {
   return []*regexp.Regexp{
     regexp.MustCompile("weather"),
@@ -17,16 +21,16 @@ func (w Weather) Matches() []*regexp.Regexp {
   }
 }
 
-func (w Weather) Help(m util.IncomingSlackMessage) {
-  message := util.HelpGenerator{
-    CommandName: "weather",
-    Description: "provides current weather and weather forcasts through the darksky weather api",
-    RegexMatches: w.Matches(),
-    Format: "jarvis (match) (zipcode)",
-    Examples: []string{"jarvis weather 46723"},
-    OtherTopics: []util.HelpGeneratorTopic{},
-  }.Generate()
-  ws.SendMessage(message, m.Channel)
+func (w Weather) Description() string {
+  return "provides current weather and weather forcasts through the darksky weather api"
+}
+
+func (w Weather) Format() string {
+  return "jarvis (match) (zipcode)"
+}
+
+func (w Weather) Examples() []string {
+  return []string{"jarvis weather 46723"}
 }
 
 func (w Weather) Execute(m util.IncomingSlackMessage) {
@@ -38,4 +42,16 @@ func (w Weather) Execute(m util.IncomingSlackMessage) {
     weather := service.Weather{}.ForecastFriendly(zipCode)
     ws.SendMessage(weather, m.Channel)
   }
+}
+
+func (w Weather) Help(m util.IncomingSlackMessage) {
+  message := util.HelpGenerator{
+    CommandName: w.Name(),
+    Description: w.Description(),
+    RegexMatches: w.Matches(),
+    Format: w.Format(),
+    Examples: w.Examples(),
+    OtherTopics: []util.HelpGeneratorTopic{},
+  }.Generate()
+  ws.SendMessage(message, m.Channel)
 }
