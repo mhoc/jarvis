@@ -37,6 +37,20 @@ func (r Remember) Examples() []string {
   return []string{"jarvis remember that my zip code is 46723", "jarvis know that my birthday is march 11 1993"}
 }
 
+func (r Remember) OtherDocs() []util.HelpTopic {
+  var keys string
+  for _, datum := range data.RegisteredDatums {
+    keys += "  " + datum.Aliases[0] + "\n"
+  }
+  keys = keys[:len(keys)-1]
+  return []util.HelpTopic{
+    util.HelpTopic{
+      Name: "data keys",
+      Body: keys,
+    },
+  }
+}
+
 func (r Remember) Execute(m util.IncomingSlackMessage) {
   regex := util.NewRegex("that (.+) is (.+)")
   if !regex.Matches(m.Text) {
@@ -51,21 +65,4 @@ func (r Remember) Execute(m util.IncomingSlackMessage) {
   }
   key = strings.Replace(key, "my", "your", -1)
   ws.SendMessage(fmt.Sprintf("Alright. I'll remember that %v is %v.", key, value), m.Channel)
-}
-
-func (r Remember) Help(m util.IncomingSlackMessage) {
-  message := util.HelpGenerator{
-    CommandName: r.Name(),
-    Description: r.Description(),
-    RegexMatches: r.Matches(),
-    Format: r.Format(),
-    Examples: r.Examples(),
-    OtherTopics: []util.HelpGeneratorTopic{
-      util.HelpGeneratorTopic{
-        Name: "data keys",
-        Body: "zipcode\nbirthday",
-      },
-    },
-  }.Generate()
-  ws.SendMessage(message, m.Channel)
 }

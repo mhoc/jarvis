@@ -13,9 +13,9 @@ type Command interface {
   Description() string
   Format() string
   Examples() []string
+  OtherDocs() []HelpTopic
 
   // Behavior
   Execute(IncomingSlackMessage)
-  Help(IncomingSlackMessage)
 
 }

@@ -34,6 +34,10 @@ func (s Status) Examples() []string {
   return []string{"jarvis status"}
 }
 
+func (s Status) OtherDocs() []util.HelpTopic {
+  return []util.HelpTopic{}
+}
+
 func (s Status) Execute(m util.IncomingSlackMessage) {
   response := "Jarvis, at your service.\n"
   version := service.Git{}.LastTag()
@@ -41,16 +45,4 @@ func (s Status) Execute(m util.IncomingSlackMessage) {
   location := config.Location()
   response += " on " + location + "."
   ws.SendMessage(response, m.Channel)
-}
-
-func (s Status) Help(m util.IncomingSlackMessage) {
-  message := util.HelpGenerator{
-    CommandName: s.Name(),
-    Description: s.Description(),
-    RegexMatches: s.Matches(),
-    Format: s.Format(),
-    Examples: s.Examples(),
-    OtherTopics: []util.HelpGeneratorTopic{},
-  }.Generate()
-  ws.SendMessage(message, m.Channel)
 }

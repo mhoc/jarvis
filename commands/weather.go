@@ -33,6 +33,10 @@ func (w Weather) Examples() []string {
   return []string{"jarvis weather 46723"}
 }
 
+func (w Weather) OtherDocs() []util.HelpTopic {
+  return []util.HelpTopic{}
+}
+
 func (w Weather) Execute(m util.IncomingSlackMessage) {
   zipCodeRegex := regexp.MustCompile("[0-9]{5}")
   zipCode := string(zipCodeRegex.Find([]byte(m.Text)))
@@ -42,16 +46,4 @@ func (w Weather) Execute(m util.IncomingSlackMessage) {
     weather := service.Weather{}.ForecastFriendly(zipCode)
     ws.SendMessage(weather, m.Channel)
   }
-}
-
-func (w Weather) Help(m util.IncomingSlackMessage) {
-  message := util.HelpGenerator{
-    CommandName: w.Name(),
-    Description: w.Description(),
-    RegexMatches: w.Matches(),
-    Format: w.Format(),
-    Examples: w.Examples(),
-    OtherTopics: []util.HelpGeneratorTopic{},
-  }.Generate()
-  ws.SendMessage(message, m.Channel)
 }
