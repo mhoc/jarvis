@@ -3,6 +3,7 @@ package main
 
 import (
   "github.com/mhoc/jarvis/config"
+  "github.com/mhoc/jarvis/data"
   "github.com/mhoc/jarvis/handlers"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/ws"
@@ -14,8 +15,9 @@ func main() {
   runtime.GOMAXPROCS(runtime.NumCPU())
   config.VerifyEnvs()
   config.LoadYaml()
-  ws.Init()
+  data.CheckRedisConn()
   handlers.Init()
+  ws.Init()
   log.Info("Jarvis is live and receiving messages")
   select {}
 }
