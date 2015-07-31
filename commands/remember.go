@@ -8,7 +8,6 @@ import (
   "github.com/mhoc/jarvis/data"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
-  "regexp"
   "strings"
 )
 
@@ -18,10 +17,10 @@ func (r Remember) Name() string {
   return "remember"
 }
 
-func (r Remember) Matches() []*regexp.Regexp {
-  return []*regexp.Regexp {
-    regexp.MustCompile("remember"),
-    regexp.MustCompile("know"),
+func (r Remember) Matches() []util.Regex {
+  return []util.Regex{
+    util.NewRegex("remember"),
+    util.NewRegex("know"),
   }
 }
 

@@ -6,27 +6,27 @@ import (
   "regexp"
 )
 
-type JarvisRegex struct {
+type Regex struct {
   goRegex *regexp.Regexp
 }
 
-func NewRegex(pattern string) JarvisRegex {
+func NewRegex(pattern string) Regex {
   goReg, err := regexp.Compile(pattern)
   Check(err)
-  return JarvisRegex{
+  return Regex{
     goRegex: goReg,
   }
 }
 
-func (jr JarvisRegex) String() string {
-  return jr.goRegex.String()
+func (r Regex) String() string {
+  return r.goRegex.String()
 }
 
-func (jr JarvisRegex) Matches(test string) bool {
-  return jr.goRegex.MatchString(test)
+func (r Regex) Matches(test string) bool {
+  return r.goRegex.MatchString(test)
 }
 
-func (jr JarvisRegex) SubExpression(test string, i int) string {
-  r := jr.goRegex.FindAllStringSubmatch(test, -1)
-  return r[0][i+1]
+func (r Regex) SubExpression(test string, i int) string {
+  res := r.goRegex.FindAllStringSubmatch(test, -1)
+  return res[0][i+1]
 }

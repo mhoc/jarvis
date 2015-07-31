@@ -6,7 +6,6 @@ import (
   "github.com/mhoc/jarvis/service"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
-  "regexp"
 )
 
 type Status struct {}
@@ -15,10 +14,10 @@ func (s Status) Name() string {
   return "status"
 }
 
-func (s Status) Matches() []*regexp.Regexp {
-  return []*regexp.Regexp{
-    regexp.MustCompile("status"),
-    regexp.MustCompile("alive"),
+func (s Status) Matches() []util.Regex {
+  return []util.Regex{
+    util.NewRegex("status"),
+    util.NewRegex("alive"),
   }
 }
 

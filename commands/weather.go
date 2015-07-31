@@ -14,10 +14,9 @@ func (w Weather) Name() string {
   return "weather"
 }
 
-func (w Weather) Matches() []*regexp.Regexp {
-  return []*regexp.Regexp{
-    regexp.MustCompile("weather"),
-    regexp.MustCompile("rain"),
+func (w Weather) Matches() []util.Regex {
+  return []util.Regex{
+    util.NewRegex("weather"),
   }
 }
 

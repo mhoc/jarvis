@@ -37,6 +37,9 @@ func StartReading() {
 func Dispatch(msg map[string]interface{}) {
   DispatchAll(msg)
   if msg["type"] == "message" {
+    if !util.MapHasElements(msg, "type", "channel", "user", "text", "ts") {
+      return
+    }
     msgStruct := util.IncomingSlackMessage{
       Type: msg["type"].(string),
       Channel: msg["channel"].(string),

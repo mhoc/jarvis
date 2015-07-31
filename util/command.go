@@ -1,13 +1,9 @@
 
 package util
 
-import (
-  "regexp"
-)
-
 type Command interface {
   Name() string
-  Matches() []*regexp.Regexp
+  Matches() []Regex
 
   // For documentation purposes
   Description() string

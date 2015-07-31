@@ -13,6 +13,7 @@ import (
 // data for command names is stored in a single location. I'll look for ways of
 // improving it eventually.
 var CommandManifest = map[string]util.Command{
+  commands.Recall{}.Name(): commands.Recall{},
   commands.Remember{}.Name(): commands.Remember{},
   commands.Status{}.Name(): commands.Status{},
   commands.Weather{}.Name(): commands.Weather{},
@@ -59,7 +60,7 @@ func IsCommand(msg util.IncomingSlackMessage) bool {
 func MatchCommand(msg util.IncomingSlackMessage) util.Command {
   for _, command := range CommandManifest {
     for _, regex := range command.Matches() {
-      if regex.MatchString(msg.Text) {
+      if regex.Matches(msg.Text) {
         return command
       }
     }
