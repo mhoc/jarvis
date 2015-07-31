@@ -11,8 +11,11 @@ import (
 )
 
 type Datum struct {
+  // Key under which the piece of data is stored in redis
   Key string
+  // Whether or not this datum is user-specific, and thus the key needs to be augmented with a userid
   UserSpec bool
+  // English triggers which would tie a piece of information to this datum
   Aliases []string
 }
 

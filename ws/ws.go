@@ -29,7 +29,8 @@ func GetSlackWsUrl() string {
   log.Trace("Getting slack websocket url")
   slackAuth := config.SlackAuthToken()
   slackUrl += slackAuth
-  data := util.HttpGet(slackUrl)
+  data, err := util.HttpGet(slackUrl)
+  util.Check(err)
   StoreJarvisUserId(data)
   return data["url"].(string)
 }

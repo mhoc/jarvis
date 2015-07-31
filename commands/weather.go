@@ -40,9 +40,16 @@ func (w Weather) Execute(m util.IncomingSlackMessage) {
   zipCodeRegex := regexp.MustCompile("[0-9]{5}")
   zipCode := string(zipCodeRegex.Find([]byte(m.Text)))
   if zipCode == "" {
-    ws.SendMessage("You should probably provide a zipcode", m.Channel)
+    ws.SendMessage("You should probably provide a zipcode.", m.Channel)
   } else {
-    weather := service.Weather{}.ForecastFriendly(zipCode)
-    ws.SendMessage(weather, m.Channel)
+    weather, err := service.Weather{}.ForecastFriendly(zipCode)
+    switch err.(type) {
+    case service.BadZipCodeError:
+      ws.SendMessage("It doesn't look like the zipcode you provided is valid.", m.Channel)
+    case error:
+      ws.SendMessage("I've encountered an error while getting your weather. Please call my daddy he can help us.", m.Channel)
+    default:
+      ws.SendMessage(weather, m.Channel)
+    }
   }
 }

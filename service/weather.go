@@ -10,12 +10,18 @@ import (
 
 type Weather struct {}
 
-func (w Weather) ForecastFriendly(zipcode string) string {
+func (w Weather) ForecastFriendly(zipcode string) (string, error) {
   log.Trace("Getting friendly weather report for %v", zipcode)
-  lat, lng := ZipCode{}.ToLatLng(zipcode)
+  lat, lng, err := ZipCode{}.ToLatLng(zipcode)
+  if err != nil {
+    return "", err
+  }
   auth := config.DarkSkyAPIToken()
   url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", auth, lat, lng)
-  data := util.HttpGet(url)
-  // fmt.Printf("%v", data)
-  return data["hourly"].(map[string]interface{})["summary"].(string)
+  data, err := util.HttpGet(url)
+  if err == nil {
+    return data["hourly"].(map[string]interface{})["summary"].(string), nil
+  } else {
+    return "", err
+  }
 }
