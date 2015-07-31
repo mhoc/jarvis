@@ -43,6 +43,15 @@ func Admins() []string {
   return ConfigFile.Admins
 }
 
+func IsAdmin(userid string) bool {
+  for _, admin := range Admins() {
+    if admin == userid {
+      return true
+    }
+  }
+  return false
+}
+
 func Location() string {
   return ConfigFile.Location
 }

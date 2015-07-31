@@ -6,6 +6,7 @@ import (
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "github.com/xuyu/goredis"
+  "strings"
   "time"
 )
 
@@ -23,25 +24,35 @@ func redisConn() *goredis.Redis {
   return conn
 }
 
-func set(key string, value string) {
+func Set(key string, value string) {
   conn := redisConn()
   err := conn.Set(key, value, 0, 0, false, false)
   util.Check(err)
 }
 
-func setTimeout(key string, value string, timeout time.Duration) {
+func SetTimeout(key string, value string, timeout time.Duration) {
   conn := redisConn()
   err := conn.Set(key, value, int(timeout.Seconds()), 0, false, false)
   util.Check(err)
 }
 
-func get(key string) (bool, string) {
+func Get(key string) (bool, string) {
   conn := redisConn()
   resp, err := conn.Get(key)
+  if err != nil && strings.Contains(err.Error(), "WRONGTYPE") {
+    return false, ""
+  }
   util.Check(err)
   if resp == nil {
     return false, ""
   } else {
     return true, string(resp)
   }
+}
+
+func Keys(match string) []string {
+  conn := redisConn()
+  resp, err := conn.Keys(match)
+  util.Check(err)
+  return resp
 }

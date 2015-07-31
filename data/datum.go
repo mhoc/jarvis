@@ -47,9 +47,9 @@ func StoreDatum(trigger string, value string, user string) bool {
   log.Trace("Storing datum %v", trigger)
   in, dat := GetDatumFromAlias(trigger)
   if in && dat.UserSpec {
-    set(dat.Key + user, value)
+    Set(dat.Key + user, value)
   } else if in {
-    set(dat.Key, value)
+    Set(dat.Key, value)
   } else {
     return false
   }
@@ -60,9 +60,9 @@ func GetDatum(trigger string, user string) (bool, string) {
   log.Trace("Getting datum %v", trigger)
   in, dat := GetDatumFromAlias(trigger)
   if in && dat.UserSpec {
-    return get(dat.Key + user)
+    return Get(dat.Key + user)
   } else if in {
-    return get(dat.Key)
+    return Get(dat.Key)
   } else {
     return false, ""
   }

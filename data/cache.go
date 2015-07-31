@@ -12,15 +12,15 @@ const (
 
 func Cache(key string, val string) {
   log.Trace("Caching %v -> %v", key, val)
-  set(CACHE_PREFIX + key, val)
+  Set(CACHE_PREFIX + key, val)
 }
 
 func CacheTimeout(key string, val string, timeout time.Duration) {
   log.Trace("Caching %v -> %v with timeout %vs", key, val, timeout.Seconds())
-  setTimeout(CACHE_PREFIX + key, val, timeout)
+  SetTimeout(CACHE_PREFIX + key, val, timeout)
 }
 
 func GetCache(key string) (bool, string) {
   log.Trace("Getting cache entry %v", key)
-  return get(CACHE_PREFIX + key)
+  return Get(CACHE_PREFIX + key)
 }
