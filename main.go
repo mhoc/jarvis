@@ -13,7 +13,6 @@ import (
 func main() {
   log.Info("Starting Jarvis")
   runtime.GOMAXPROCS(runtime.NumCPU())
-  config.VerifyEnvs()
   config.LoadYaml()
   data.CheckRedisConn()
   handlers.Init()

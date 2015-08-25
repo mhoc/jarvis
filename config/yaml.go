@@ -8,6 +8,12 @@ import (
 )
 
 var ConfigFile struct {
+  Redis string `json:"redis"`
+  Tokens struct {
+    Slack string `json:"slack"`
+    DarkSky string `json:"darksky"`
+    ZipCode string `json:"zipcode"`
+  }
   Admins []string `json:"admins"`
   Location string `json:"location"`
   Static []map[string]interface{} `json:"static"`
@@ -29,6 +35,18 @@ func LoadYaml() {
 
 func ValidateYaml() {
   log.Info("Validating configuration file")
+  if ConfigFile.Redis == "" {
+    log.Fatal("Must provide a redis uri inside config.yaml under 'redis'")
+  }
+  if ConfigFile.Tokens.Slack == "" {
+    log.Fatal("Must provide a slack auth token inside config.yaml under tokens.slack")
+  }
+  if ConfigFile.Tokens.DarkSky == "" {
+    log.Fatal("Must provide a darksky weather auth token inside config.yaml under tokens.darksky")
+  }
+  if ConfigFile.Tokens.ZipCode == "" {
+    log.Fatal("Must provide a zip code api auth token inside config.yaml under tokens.zipcode")
+  }
   if ConfigFile.Admins == nil {
     log.Fatal("Must provide a list of admin jarvis users in config.yaml")
   }
@@ -41,6 +59,22 @@ func ValidateYaml() {
   if ConfigFile.Static == nil {
     log.Warn("You can provide static data under the `static` key in config.yaml if you like")
   }
+}
+
+func RedisURI() string {
+  return ConfigFile.Redis
+}
+
+func SlackAuthToken() string {
+  return ConfigFile.Tokens.Slack
+}
+
+func DarkSkyAPIToken() string {
+  return ConfigFile.Tokens.DarkSky
+}
+
+func ZipCodeAPIToken() string {
+  return ConfigFile.Tokens.ZipCode
 }
 
 func Admins() []string {
