@@ -51,13 +51,14 @@ func ValidateYaml() {
     log.Fatal("Must provide a zip code api auth token inside config.yaml under tokens.zipcode")
   }
   if ConfigFile.Admins == nil {
-    log.Fatal("Must provide a list of admin jarvis users in config.yaml")
+    ConfigFile.Admins = make([]string, 0, 0)
   }
   if len(ConfigFile.Admins) == 0 {
     log.Warn("Admin level commands will be unavailable if no admins are provided in config.yaml")
   }
   if ConfigFile.Location == "" {
-    log.Fatal("Must provide a human readable location name for where jarvis is running in config.yaml")
+    log.Warn("No human readable location name provided under `location` in `config.yaml`")
+    ConfigFile.Location = "a very secret place"
   }
   if ConfigFile.Static == nil {
     log.Warn("You can provide static data under the `static` key in config.yaml if you like")
