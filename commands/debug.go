@@ -11,9 +11,15 @@ import (
   "os"
 )
 
-type Debug struct {}
+type Debug struct {
+  AccessAttempts []string
+}
 
-var DebugAccessAttempts = make([]string, 0)
+func NewDebug() Debug {
+  return Debug{
+    AccessAttempts: make([]string, 0),
+  }
+}
 
 func (c Debug) Name() string {
   return "debug"
@@ -45,7 +51,7 @@ func (c Debug) Execute(m util.IncomingSlackMessage) {
   if !config.IsAdmin(m.User) {
     ws.SendMessage("*ACCESS DENIED* :police_car: *THIS ATTEMPT HAS BEEN REPORTED* :police_car: *ACCESS DENIED*", m.Channel)
     name := service.Slack{}.UserNameFromUserId(m.User)
-    DebugAccessAttempts = append(DebugAccessAttempts, "*" + name + "*: " + m.Text)
+    c.AccessAttempts = append(c.AccessAttempts, "*" + name + "*: " + m.Text)
     return
   }
   c.debugSuicide(m)
@@ -65,7 +71,7 @@ func (c Debug) debugAttempts(m util.IncomingSlackMessage) {
   attempts := util.NewRegex("jarvis debug attempts")
   if attempts.Matches(m.Text) {
     resp := "I've recorded these attempts at debug access since I was last started:"
-    for _, attempt := range DebugAccessAttempts {
+    for _, attempt := range c.AccessAttempts {
       resp += "\n" + attempt
     }
     ws.SendMessage(resp, m.Channel)

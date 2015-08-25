@@ -10,6 +10,10 @@ import (
 
 type Status struct {}
 
+func NewStatus() Status {
+  return Status{}
+}
+
 func (s Status) Name() string {
   return "status"
 }

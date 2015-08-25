@@ -10,6 +10,10 @@ import (
 
 type Weather struct {}
 
+func NewWeather() Weather {
+  return Weather{}
+}
+
 func (w Weather) Name() string {
   return "weather"
 }

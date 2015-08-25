@@ -13,6 +13,10 @@ import (
 
 type Remember struct {}
 
+func NewRemember() Remember {
+  return Remember{}
+}
+
 func (r Remember) Name() string {
   return "remember"
 }

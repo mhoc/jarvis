@@ -8,22 +8,22 @@ import (
   "github.com/mhoc/jarvis/ws"
   "strings"
 )
-
-// This is a super awkward way of filling this map, but it ensures that the
-// data for command names is stored in a single location. I'll look for ways of
-// improving it eventually.
-var CommandManifest = map[string]util.Command{
-  commands.Debug{}.Name(): commands.Debug{},
-  commands.Recall{}.Name(): commands.Recall{},
-  commands.Remember{}.Name(): commands.Remember{},
-  commands.Status{}.Name(): commands.Status{},
-  commands.Weather{}.Name(): commands.Weather{},
-}
-
+var CommandManifest map[string]util.Command
 var cmdCh = make(chan util.IncomingSlackMessage)
 
 func InitCommands() {
   log.Info("Initing command listener")
+  // This is a super awkward way of filling this map, but it ensures that the
+  // data for command names is stored in a single location. I'll look for ways of
+  // improving it eventually.
+  CommandManifest = map[string]util.Command{
+    commands.Debug{}.Name(): commands.NewDebug(),
+    commands.Recall{}.Name(): commands.NewRecall(),
+    commands.Remember{}.Name(): commands.NewRemember(),
+    commands.Static{}.Name(): commands.NewStatic(),
+    commands.Status{}.Name(): commands.NewStatus(),
+    commands.Weather{}.Name(): commands.NewWeather(),
+  }
   ws.SubscribeToMessages(cmdCh)
   go BeginCommandLoop()
 }

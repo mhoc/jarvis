@@ -10,6 +10,7 @@ import (
 var ConfigFile struct {
   Admins []string `json:"admins"`
   Location string `json:"location"`
+  Static []map[string]interface{} `json:"static"`
 }
 const ConfigLocation = "config.yaml"
 
@@ -37,6 +38,9 @@ func ValidateYaml() {
   if ConfigFile.Location == "" {
     log.Fatal("Must provide a human readable location name for where jarvis is running in config.yaml")
   }
+  if ConfigFile.Static == nil {
+    log.Warn("You can provide static data under the `static` key in config.yaml if you like")
+  }
 }
 
 func Admins() []string {
@@ -54,4 +58,8 @@ func IsAdmin(userid string) bool {
 
 func Location() string {
   return ConfigFile.Location
+}
+
+func Static() []map[string]interface{} {
+  return ConfigFile.Static
 }

@@ -13,6 +13,10 @@ import (
 
 type Recall struct {}
 
+func NewRecall() Recall {
+  return Recall{}
+}
+
 func (r Recall) Name() string {
   return "recall"
 }
