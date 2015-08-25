@@ -11,3 +11,6 @@ deps:
 
 clean:
 	rm jarvis
+
+run: build
+	./jarvis
