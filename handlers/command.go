@@ -3,6 +3,7 @@ package handlers
 
 import (
   "github.com/mhoc/jarvis/commands"
+  "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
@@ -32,6 +33,12 @@ func BeginCommandLoop() {
   for {
     msg := <-cmdCh
     if !IsCommand(msg) {
+      continue
+    }
+    if config.ChannelIsBlacklisted(msg.Channel) {
+      continue
+    }
+    if config.HasWhitelist() && !config.ChannelIsWhitelisted(msg.Channel) {
       continue
     }
     cmd := MatchCommand(msg)

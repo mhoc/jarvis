@@ -57,6 +57,7 @@ func (c Debug) Execute(m util.IncomingSlackMessage) {
   c.debugSuicide(m)
   c.debugAttempts(m)
   c.debugDumpRedisKeys(m)
+  c.debugInfo(m)
 }
 
 func (c Debug) debugSuicide(m util.IncomingSlackMessage) {
@@ -87,6 +88,15 @@ func (c Debug) debugDumpRedisKeys(m util.IncomingSlackMessage) {
       _, v := data.Get(key)
       resp += key + ": " + v + "\n"
     }
+    ws.SendMessage(resp, m.Channel)
+  }
+}
+
+func (c Debug) debugInfo(m util.IncomingSlackMessage) {
+  reg := util.NewRegex("jarvis debug info")
+  if reg.Matches(m.Text) {
+    resp := "You are user " + m.User + "\n"
+    resp += "We are in channel " + m.Channel
     ws.SendMessage(resp, m.Channel)
   }
 }

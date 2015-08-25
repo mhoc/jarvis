@@ -16,8 +16,11 @@ var ConfigFile struct {
   }
   Admins []string `json:"admins"`
   Location string `json:"location"`
+  ChannelWhitelist []string `json:"whitelist"`
+  ChannelBlacklist []string `json:"blacklist"`
   Static []map[string]interface{} `json:"static"`
 }
+
 const ConfigLocation = "config.yaml"
 
 func LoadYaml() {
@@ -92,6 +95,28 @@ func IsAdmin(userid string) bool {
 
 func Location() string {
   return ConfigFile.Location
+}
+
+func HasWhitelist() bool {
+  return len(ConfigFile.ChannelWhitelist) != 0
+}
+
+func ChannelIsWhitelisted(ch string) bool {
+  for _, i := range ConfigFile.ChannelWhitelist {
+    if ch == i {
+      return true
+    }
+  }
+  return false
+}
+
+func ChannelIsBlacklisted(ch string) bool {
+  for _, i := range ConfigFile.ChannelBlacklist {
+    if ch == i {
+      return true
+    }
+  }
+  return false
 }
 
 func Static() []map[string]interface{} {
