@@ -19,7 +19,49 @@ Directory contains some python scripts for managing jarvis development.
 
 # Config.yaml
 
-All environment config for jarvis is done through config.yaml. As such, this file will have secrets in it. An example file is provided in the repo with all the available keys set.
+All environment config for jarvis is done through config.yaml. As such, this file will have secrets in it. An example file is provided below:
+
+```
+# The URI and passwords and such where redis is hosted at
+redis: 'localhost:6379'
+
+# API Tokens
+tokens:
+  
+  # Slack API token, duh
+  slack: token-goes-here
+  
+  # Darksky for weather api (https://developer.forecast.io)
+  darksky: token-goes-here
+  
+  # Zipcode API (https://www.zipcodeapi.com/)
+  zipcode: token-goes-here
+
+# A list of admins by userid
+# Admins have access to special commands (see commands/debug.go for some of them)
+admins:
+  - U01234567
+
+# A human readable location name for jarvis. used in jarvis status.
+location: My Cool Computer
+
+# A channel blacklist.
+# Any commands sent on these channels will be ignored
+blacklist:
+  - G0123456N
+
+# A channel whitelist. 
+# If this list has at least one element, any commands sent to any channel except those in the whitelist will be ignored
+whitelist:
+  - G083EQ05N
+
+# Custom responses
+# See commands/static.go
+static:
+  - key: michael
+    value: I'm pretty sure michael is the coolest guy of all time, right?
+
+```
 
 # Example (Probably Bad) Deployment
 
