@@ -2,6 +2,7 @@
 package handlers
 
 import (
+  "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
@@ -21,6 +22,12 @@ func InitHelp() {
 func BeginHelpLoop() {
   for {
     msg := <-helpCh
+    if config.ChannelIsBlacklisted(msg.Channel) {
+      continue
+    }
+    if config.HasWhitelist() && !config.ChannelIsWhitelisted(msg.Channel) {
+      continue
+    }
     if helpRegex.Matches(msg.Text) {
       generalHelp(msg)
     } else if helpCommandRegex.Matches(msg.Text) {

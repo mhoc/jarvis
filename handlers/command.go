@@ -35,10 +35,13 @@ func BeginCommandLoop() {
     if !IsCommand(msg) {
       continue
     }
+    log.Info("%v", config.ConfigFile.ChannelWhitelist)
     if config.ChannelIsBlacklisted(msg.Channel) {
+      log.Trace("Ignoring message sent on blacklisted channel %v", msg.Channel)
       continue
     }
     if config.HasWhitelist() && !config.ChannelIsWhitelisted(msg.Channel) {
+      log.Trace("Running with whitelist. Ignoring message not sent on whitelisted channel %v", msg.Channel)
       continue
     }
     cmd := MatchCommand(msg)

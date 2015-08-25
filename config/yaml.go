@@ -8,17 +8,17 @@ import (
 )
 
 var ConfigFile struct {
-  Redis string `json:"redis"`
+  Redis string `yaml:"redis"`
   Tokens struct {
-    Slack string `json:"slack"`
-    DarkSky string `json:"darksky"`
-    ZipCode string `json:"zipcode"`
+    Slack string `yaml:"slack"`
+    DarkSky string `yaml:"darksky"`
+    ZipCode string `yaml:"zipcode"`
   }
-  Admins []string `json:"admins"`
-  Location string `json:"location"`
-  ChannelWhitelist []string `json:"whitelist"`
-  ChannelBlacklist []string `json:"blacklist"`
-  Static []map[string]interface{} `json:"static"`
+  Admins []string `yaml:"admins"`
+  Location string `yaml:"location"`
+  ChannelWhitelist []string `yaml:"whitelist"`
+  ChannelBlacklist []string `yaml:"blacklist"`
+  Static []map[string]interface{} `yaml:"static"`
 }
 
 const ConfigLocation = "config.yaml"
