@@ -1,7 +1,4 @@
 
-run: build
-	./jarvis
-
 build: jarvis
 
 jarvis: deps main.go
