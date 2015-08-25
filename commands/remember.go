@@ -39,7 +39,7 @@ func (r Remember) Examples() []string {
 func (r Remember) OtherDocs() []util.HelpTopic {
   var keys string
   for _, datum := range data.RegisteredDatums {
-    keys += "  " + datum.Aliases[0] + "\n"
+    keys += datum.Aliases[0] + "\n"
   }
   keys = keys[:len(keys)-1]
   return []util.HelpTopic{
