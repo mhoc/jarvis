@@ -54,3 +54,15 @@ My entire continuous integration deployment script on codeship is:
 ```
 ssh root@domain.com "cd go/src/github.com/mhoc/jarvis && git pull && supervisorctl reload"
 ```
+
+# FAQ
+
+I use the word "frequently" very lightly.
+
+* What happens if two commands have overlapping regex definitions?
+
+The answer is that it depends.
+
+For example, if in `config.yaml` you include a `static` definition where `key` is `help`, then I can tell you that jarvis will output both the help text and also your static command.
+
+That being said, providing cleaner command regex definitions is an area of improvement I am looking in to. Right now there are a few commands (see debug) where the command itself checks regexes against the input and might do nothing. There are others which specifically check that the word "jarvis" is in the input (weather.go, debug.go). There are others which don't do this. Its a mess that im going to improve.
