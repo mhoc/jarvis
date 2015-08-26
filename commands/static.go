@@ -21,7 +21,7 @@ func NewStatic() Static {
   }
   regexes := make([]util.Regex, 0, 0)
   for key, _ := range actTopics {
-    regexes = append(regexes, util.NewRegex(key))
+    regexes = append(regexes, util.NewRegex("^jarvis " + key + "$"))
   }
   return Static{
     Topics: actTopics,
@@ -39,10 +39,6 @@ func (c Static) Matches() []util.Regex {
 
 func (c Static) Description() string {
   return "provides the ability for jarvis admins to provide easily accessible static data to users based on certain keywords"
-}
-
-func (c Static) Format() string {
-  return "jarvis (keyword)"
 }
 
 func (c Static) Examples() []string {

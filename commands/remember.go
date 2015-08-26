@@ -23,17 +23,13 @@ func (r Remember) Name() string {
 
 func (r Remember) Matches() []util.Regex {
   return []util.Regex{
-    util.NewRegex("remember"),
-    util.NewRegex("know"),
+    util.NewRegex("^jarvis remember that (?P<key>.+) is (?P<value>.+)$"),
+    util.NewRegex("^jarvis know that (?P<key>.+) is (?P<value>.+)$"),
   }
 }
 
 func (r Remember) Description() string {
   return "instructs jarvis to commit some piece of information to memory.\ninformation has categories which the commit has to reference.\nthus you cant have jarvis remember arbitrary data. rather, only data which jarvis is configured to remember."
-}
-
-func (r Remember) Format() string {
-  return "jarvis (match) that (data key) is (data value)"
 }
 
 func (r Remember) Examples() []string {

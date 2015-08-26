@@ -9,6 +9,8 @@ import (
   "github.com/mhoc/jarvis/ws"
   "strings"
 )
+
+var commandRegex = util.NewRegex("^[Jj]arvis [A-Za-z0-9 ]+")
 var CommandManifest map[string]util.Command
 var cmdCh = make(chan util.IncomingSlackMessage)
 
@@ -35,7 +37,6 @@ func BeginCommandLoop() {
     if !IsCommand(msg) {
       continue
     }
-    log.Info("%v", config.ConfigFile.ChannelWhitelist)
     if config.ChannelIsBlacklisted(msg.Channel) {
       log.Trace("Ignoring message sent on blacklisted channel %v", msg.Channel)
       continue
@@ -55,10 +56,7 @@ func IsCommand(msg util.IncomingSlackMessage) bool {
   if strings.Contains(msg.Text, "help") {
     return false
   }
-  if strings.Split(msg.Text, " ")[0] == "jarvis" {
-    return true
-  }
-  if strings.Split(msg.Text, " ")[0] == "Jarvis" {
+  if commandRegex.Matches(msg.Text) {
     return true
   }
   if strings.Contains(msg.Text, "jarivs") {

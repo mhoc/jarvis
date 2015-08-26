@@ -27,16 +27,12 @@ func (c Debug) Name() string {
 
 func (c Debug) Matches() []util.Regex {
   return []util.Regex{
-    util.NewRegex("debug"),
+    util.NewRegex("^jarvis debug (?P<command>.+)$"),
   }
 }
 
 func (c Debug) Description() string {
   return "provides various debug utilities for inspecting jarvis behavior"
-}
-
-func (c Debug) Format() string {
-  return "jarvis debug (debug command)"
 }
 
 func (c Debug) Examples() []string {

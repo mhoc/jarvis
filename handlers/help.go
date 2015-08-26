@@ -9,8 +9,8 @@ import (
   "strings"
 )
 
-var helpRegex = util.NewRegex("^jarvis help$")
-var helpCommandRegex = util.NewRegex("jarvis help ([a-z]+)")
+var helpRegex = util.NewRegex("^[Jj]arvis help$")
+var helpCommandRegex = util.NewRegex("^[Jj]arvis help ([A-Za-z]+)$")
 var helpCh = make(chan util.IncomingSlackMessage)
 
 func InitHelp() {
@@ -63,8 +63,7 @@ func helpGenerate(c util.Command) string {
   for _, match := range c.Matches() {
     help += "  " + match.String() + "\n"
   }
-  help += "\nformat\n  " + c.Format() + "\n\n"
-  help += "examples\n"
+  help += "\nexamples\n"
   for _, ex := range c.Examples() {
     help += "  " + ex + "\n"
   }

@@ -7,7 +7,6 @@ type Command interface {
 
   // For documentation purposes
   Description() string
-  Format() string
   Examples() []string
   OtherDocs() []HelpTopic
 

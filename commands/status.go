@@ -20,17 +20,14 @@ func (s Status) Name() string {
 
 func (s Status) Matches() []util.Regex {
   return []util.Regex{
-    util.NewRegex("status"),
-    util.NewRegex("alive"),
+    util.NewRegex("^jarvis status$"),
+    util.NewRegex("^jarvis are you alive$"),
+    util.NewRegex("^jarvis are you awake$"),
   }
 }
 
 func (s Status) Description() string {
   return "prints status information about the jarvis runtime, including the running version and location"
-}
-
-func (s Status) Format() string {
-  return "jarvis (match)"
 }
 
 func (s Status) Examples() []string {

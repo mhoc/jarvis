@@ -20,16 +20,13 @@ func (w Weather) Name() string {
 
 func (w Weather) Matches() []util.Regex {
   return []util.Regex{
-    util.NewRegex("weather"),
+    util.NewRegex("^jarvis weather$"),
+    util.NewRegex("^jarvis weather (?P<zipcode>[0-9]{5})$"),
   }
 }
 
 func (w Weather) Description() string {
   return "provides current weather and weather forcasts through the darksky weather api.\n you can use the 'remember' command to give jarvis your zipcode and it will use it if you don't provide a zipcode in the command."
-}
-
-func (w Weather) Format() string {
-  return "jarvis (match) (zipcode)"
 }
 
 func (w Weather) Examples() []string {

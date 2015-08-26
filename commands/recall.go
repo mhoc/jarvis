@@ -23,18 +23,14 @@ func (r Recall) Name() string {
 
 func (r Recall) Matches() []util.Regex {
   return []util.Regex{
-    util.NewRegex("recall"),
-    util.NewRegex("get"),
-    util.NewRegex("what is"),
+    util.NewRegex("^jarvis recall (?P<key>.+)$"),
+    util.NewRegex("^jarvis get (?P<key>.+)$"),
+    util.NewRegex("^jarvis what is (?P<key>.+)$"),
   }
 }
 
 func (r Recall) Description() string {
   return "instructs jarvis to recall some piece of information which he has already stored."
-}
-
-func (r Recall) Format() string {
-  return "jarvis (match) (data key)"
 }
 
 func (r Recall) Examples() []string {
