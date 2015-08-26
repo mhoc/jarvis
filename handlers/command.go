@@ -34,7 +34,7 @@ func InitCommands() {
 func BeginCommandLoop() {
   for {
     msg := <-cmdCh
-    if !IsCommand(msg) {
+    if !IsCommand(&msg) {
       continue
     }
     if config.ChannelIsBlacklisted(msg.Channel) {
@@ -45,6 +45,7 @@ func BeginCommandLoop() {
       log.Trace("Running with whitelist. Ignoring message not sent on whitelisted channel %v", msg.Channel)
       continue
     }
+    FormatCommand(&msg)
     cmd := MatchCommand(msg)
     if cmd != nil {
       go cmd.Execute(msg)
@@ -52,18 +53,18 @@ func BeginCommandLoop() {
   }
 }
 
-func IsCommand(msg util.IncomingSlackMessage) bool {
+func IsCommand(msg *util.IncomingSlackMessage) bool {
   if strings.Contains(msg.Text, "help") {
     return false
   }
   if commandRegex.Matches(msg.Text) {
     return true
   }
-  if strings.Contains(msg.Text, "jarivs") {
-    ws.SendMessage("Dude, you can't even spell my name right? Whatever.", msg.Channel)
-    return true
-  }
   return false
+}
+
+func FormatCommand(msg *util.IncomingSlackMessage) {
+  msg.Text = strings.Replace(msg.Text, "Jarvis", "jarvis", -1)
 }
 
 func MatchCommand(msg util.IncomingSlackMessage) util.Command {
