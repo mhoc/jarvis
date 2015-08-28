@@ -60,8 +60,8 @@ func helpGenerate(c util.Command) string {
   help += c.Name() + "\n"
   help += "  " + strings.Replace(c.Description(), "\n", "\n  ", -1) + "\n\n"
   help += "matches on\n"
-  for _, match := range c.Matches() {
-    help += "  " + match.String() + "\n"
+  for _, match := range c.SubCommands() {
+    help += "  " + match.Pattern.String() + "\n"
   }
   help += "\nexamples\n"
   for _, ex := range c.Examples() {

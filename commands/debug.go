@@ -5,94 +5,75 @@ package commands
 import (
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/data"
-  "github.com/mhoc/jarvis/service"
   "github.com/mhoc/jarvis/util"
   "github.com/mhoc/jarvis/ws"
   "os"
 )
 
-type Debug struct {
-  AccessAttempts []string
-}
+type Debug struct {}
 
 func NewDebug() Debug {
-  return Debug{
-    AccessAttempts: make([]string, 0),
-  }
+  return Debug{}
 }
 
 func (c Debug) Name() string {
   return "debug"
 }
 
-func (c Debug) Matches() []util.Regex {
-  return []util.Regex{
-    util.NewRegex("^jarvis debug (?P<command>.+)$"),
-  }
-}
-
 func (c Debug) Description() string {
-  return "provides various debug utilities for inspecting jarvis behavior"
+  return "provides admin level debug functionality into the jarvis and slack internals."
 }
 
 func (c Debug) Examples() []string {
-  return []string{"if you should use this command you already know how to use it"}
+  return []string{"jarvis debug suicide"}
 }
 
 func (c Debug) OtherDocs() []util.HelpTopic {
   return []util.HelpTopic{}
 }
 
-func (c Debug) Execute(m util.IncomingSlackMessage) {
+func (c Debug) SubCommands() []util.SubCommand {
+  return []util.SubCommand{
+    util.NewSubCommand("^jarvis debug dump redis$", c.DumpRedis),
+    util.NewSubCommand("^jarvis debug suicide$", c.Suicide),
+    util.NewSubCommand("^jarvis debug info$", c.Info),
+  }
+}
+
+func (c Debug) IsAdmin(m util.IncomingSlackMessage) bool {
   if !config.IsAdmin(m.User) {
     ws.SendMessage("*ACCESS DENIED* :police_car: *THIS ATTEMPT HAS BEEN REPORTED* :police_car: *ACCESS DENIED*", m.Channel)
-    name := service.Slack{}.UserNameFromUserId(m.User)
-    c.AccessAttempts = append(c.AccessAttempts, "*" + name + "*: " + m.Text)
+    return false
+  }
+  return true
+}
+
+func (c Debug) DumpRedis(m util.IncomingSlackMessage, r util.Regex) {
+  if !c.IsAdmin(m) {
     return
   }
-  c.debugSuicide(m)
-  c.debugAttempts(m)
-  c.debugDumpRedisKeys(m)
-  c.debugInfo(m)
+  keys := data.Keys("*")
+  resp := "I'm currently tracking these keys in storage:\n"
+  for _, key := range keys {
+    _, v := data.Get(key)
+    resp += key + ": " + v + "\n"
+  }
+  ws.SendMessage(resp, m.Channel)
 }
 
-func (c Debug) debugSuicide(m util.IncomingSlackMessage) {
-  suicide := util.NewRegex("jarvis debug suicide")
-  if suicide.Matches(m.Text) {
-    ws.SendMessage("You got it boss, nighty night.", m.Channel)
-    os.Exit(0)
+func (c Debug) Suicide(m util.IncomingSlackMessage, r util.Regex) {
+  if !c.IsAdmin(m) {
+    return
   }
+  ws.SendMessage("You got it boss, nighty night.", m.Channel)
+  os.Exit(0)
 }
 
-func (c Debug) debugAttempts(m util.IncomingSlackMessage) {
-  attempts := util.NewRegex("jarvis debug attempts")
-  if attempts.Matches(m.Text) {
-    resp := "I've recorded these attempts at debug access since I was last started:"
-    for _, attempt := range c.AccessAttempts {
-      resp += "\n" + attempt
-    }
-    ws.SendMessage(resp, m.Channel)
+func (c Debug) Info(m util.IncomingSlackMessage, r util.Regex) {
+  if !c.IsAdmin(m) {
+    return
   }
-}
-
-func (c Debug) debugDumpRedisKeys(m util.IncomingSlackMessage) {
-  reg := util.NewRegex("jarvis debug dump redis")
-  if reg.Matches(m.Text) {
-    keys := data.Keys("*")
-    resp := "I'm currently tracking these keys in storage:\n"
-    for _, key := range keys {
-      _, v := data.Get(key)
-      resp += key + ": " + v + "\n"
-    }
-    ws.SendMessage(resp, m.Channel)
-  }
-}
-
-func (c Debug) debugInfo(m util.IncomingSlackMessage) {
-  reg := util.NewRegex("jarvis debug info")
-  if reg.Matches(m.Text) {
-    resp := "You are user " + m.User + "\n"
-    resp += "We are in channel " + m.Channel
-    ws.SendMessage(resp, m.Channel)
-  }
+  resp := "You are user " + m.User + "\n"
+  resp += "We are in channel " + m.Channel
+  ws.SendMessage(resp, m.Channel)
 }

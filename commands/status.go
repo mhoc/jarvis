@@ -18,14 +18,6 @@ func (s Status) Name() string {
   return "status"
 }
 
-func (s Status) Matches() []util.Regex {
-  return []util.Regex{
-    util.NewRegex("^jarvis status$"),
-    util.NewRegex("^jarvis are you alive$"),
-    util.NewRegex("^jarvis are you awake$"),
-  }
-}
-
 func (s Status) Description() string {
   return "prints status information about the jarvis runtime, including the running version and location"
 }
@@ -38,7 +30,15 @@ func (s Status) OtherDocs() []util.HelpTopic {
   return []util.HelpTopic{}
 }
 
-func (s Status) Execute(m util.IncomingSlackMessage) {
+func (s Status) SubCommands() []util.SubCommand {
+  return []util.SubCommand{
+    util.NewSubCommand("^jarvis status$", s.Report),
+    util.NewSubCommand("^jarvis are you alive$", s.Report),
+    util.NewSubCommand("^jarvis are you awake$", s.Report),
+  }
+}
+
+func (s Status) Report(m util.IncomingSlackMessage, r util.Regex) {
   response := "Jarvis, at your service.\n"
   version := service.Git{}.LastTag()
   response += "I'm running version " + version

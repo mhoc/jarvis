@@ -10,14 +10,9 @@ import (
 
 type Weather struct {}
 
-func (w Weather) ForecastFriendly(zipcode string) (string, error) {
-  log.Trace("Getting friendly weather report for %v", zipcode)
-  lat, lng, err := ZipCode{}.ToLatLng(zipcode)
-  if err != nil {
-    return "", err
-  }
-  auth := config.DarkSkyAPIToken()
-  url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", auth, lat, lng)
+func (w Weather) ForecastFriendly(lat float64, lng float64) (string, error) {
+  log.Trace("Getting friendly weather report for %v %v", lat, lng)
+  url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", config.DarkSkyAPIToken(), lat, lng)
   data, err := util.HttpGet(url)
   if err == nil {
     return data["hourly"].(map[string]interface{})["summary"].(string), nil

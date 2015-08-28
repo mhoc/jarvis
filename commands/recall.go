@@ -21,14 +21,6 @@ func (r Recall) Name() string {
   return "recall"
 }
 
-func (r Recall) Matches() []util.Regex {
-  return []util.Regex{
-    util.NewRegex("^jarvis recall (?P<key>.+)$"),
-    util.NewRegex("^jarvis get (?P<key>.+)$"),
-    util.NewRegex("^jarvis what is (?P<key>.+)$"),
-  }
-}
-
 func (r Recall) Description() string {
   return "instructs jarvis to recall some piece of information which he has already stored."
 }
@@ -51,13 +43,16 @@ func (r Recall) OtherDocs() []util.HelpTopic {
   }
 }
 
-func (r Recall) Execute(m util.IncomingSlackMessage) {
-  regex := util.NewRegex("jarvis (recall|get|what is) ([A-Za-z0-9 ]+)")
-  if !regex.Matches(m.Text) {
-    ws.SendMessage("My appologies but I can't seem to parse your query.", m.Channel)
-    return
+func (r Recall) SubCommands() []util.SubCommand {
+  return []util.SubCommand{
+    util.NewSubCommand("^jarvis recall (?P<key>.+)$", r.Get),
+    util.NewSubCommand("^jarvis get (?P<key>.+)$", r.Get),
+    util.NewSubCommand("^jarvis what is (?P<key>.+)$", r.Get),
   }
-  key := regex.SubExpression(m.Text, 1)
+}
+
+func (r Recall) Get(m util.IncomingSlackMessage, reg util.Regex) {
+  key := reg.SubExpression(m.Text, 0)
   in, data := data.GetDatum(key, m.User)
   key = strings.Replace(key, "my", "your", -1)
   if !in || data == "" {

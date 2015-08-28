@@ -10,31 +10,27 @@ import (
 
 type Static struct {
   Topics map[string]string
-  Regexes []util.Regex
+  UserCommands []util.SubCommand
 }
 
 func NewStatic() Static {
+  s := Static{}
   rawTopics := config.Static()
   actTopics := make(map[string]string)
   for _, t := range rawTopics {
     actTopics[t["key"].(string)] = t["data"].(string)
   }
-  regexes := make([]util.Regex, 0, 0)
+  userCmds := make([]util.SubCommand, 0, 0)
   for key, _ := range actTopics {
-    regexes = append(regexes, util.NewRegex("^jarvis " + key + "$"))
+    userCmds = append(userCmds, util.NewSubCommand("^jarvis " + key + "$", s.Exec))
   }
-  return Static{
-    Topics: actTopics,
-    Regexes: regexes,
-  }
+  s.Topics = actTopics
+  s.UserCommands = userCmds
+  return s
 }
 
 func (c Static) Name() string {
   return "static"
-}
-
-func (c Static) Matches() []util.Regex {
-  return c.Regexes
 }
 
 func (c Static) Description() string {
@@ -42,9 +38,9 @@ func (c Static) Description() string {
 }
 
 func (c Static) Examples() []string {
-  if len(c.Regexes) > 0 {
+  if len(c.UserCommands) > 0 {
     return []string{
-      "jarvis " + c.Regexes[0].String(),
+      "see 'matches on' above",
     }
   }
   return []string{}
@@ -54,11 +50,10 @@ func (c Static) OtherDocs() []util.HelpTopic {
   return []util.HelpTopic{}
 }
 
-func (c Static) Execute(m util.IncomingSlackMessage) {
-  for _, regex := range c.Regexes {
-    if regex.Matches(m.Text) {
-      ws.SendMessage(c.Topics[regex.String()], m.Channel)
-      return
-    }
-  }
+func (c Static) SubCommands() []util.SubCommand {
+  return c.UserCommands
+}
+
+func (c Static) Exec(m util.IncomingSlackMessage, r util.Regex) {
+  ws.SendMessage(c.Topics[r.String()], m.Channel)
 }

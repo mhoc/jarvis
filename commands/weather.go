@@ -18,13 +18,6 @@ func (w Weather) Name() string {
   return "weather"
 }
 
-func (w Weather) Matches() []util.Regex {
-  return []util.Regex{
-    util.NewRegex("^jarvis weather$"),
-    util.NewRegex("^jarvis weather (?P<zipcode>[0-9]{5})$"),
-  }
-}
-
 func (w Weather) Description() string {
   return "provides current weather and weather forcasts through the darksky weather api.\n you can use the 'remember' command to give jarvis your zipcode and it will use it if you don't provide a zipcode in the command."
 }
@@ -37,44 +30,47 @@ func (w Weather) OtherDocs() []util.HelpTopic {
   return []util.HelpTopic{}
 }
 
-func (w Weather) Execute(m util.IncomingSlackMessage) {
-  // Different types of requests to the weather api match different regexes
-  noZipCodeProvided := util.NewRegex("^jarvis weather$")
-  zipCodeProvided := util.NewRegex("^jarvis weather ([0-9]{5})$")
-  if noZipCodeProvided.Matches(m.Text) {
-    w.noZipCodeProvided(m)
-  } else if zipCodeProvided.Matches(m.Text) {
-    w.zipCodeProvided(zipCodeProvided.SubExpression(m.Text, 0), m)
-  } else {
-    ws.SendMessage("I don't recognize that type of weather request. Sorry :(", m.Channel)
+func (w Weather) SubCommands() []util.SubCommand {
+  return []util.SubCommand{
+    util.NewSubCommand("^jarvis weather$", w.NoZipCode),
+    util.NewSubCommand("^jarvis weather (?P<zipcode>[0-9]{5})$", w.WithZipCode),
   }
 }
 
-func (w Weather) noZipCodeProvided(m util.IncomingSlackMessage) {
+func (w Weather) NoZipCode(m util.IncomingSlackMessage, r util.Regex) {
   in, storedZipCode := data.GetDatum("my zip", m.User)
   if !in {
-    ws.SendMessage("You didn't provide a location and I don't have one on file for you. Bummer.", m.Channel)
+    ws.SendMessage("If you give me your zipcode to remember I can fetch the weather for you easier. Try `jarvis help remember`.", m.Channel)
     return
   }
-  weather, err := service.Weather{}.ForecastFriendly(storedZipCode)
+  lat, lng, err := service.ZipCode{}.ToLatLng(storedZipCode)
   switch err.(type) {
   case service.BadZipCodeError:
-    ws.SendMessage("The zip code I have on file for you doesn't appear to be valid. Might want to fix that.", m.Channel)
+    ws.SendMessage("The zip code I have on file for you doesn't appear to be valid.", m.Channel)
   case error:
-    ws.SendMessage("A fatal error has occured. Don't worry I'm fine.", m.Channel)
-  default:
+    ws.SendMessage("I've encountered an error while converting your zipcode into latitude and longitude coordinates.", m.Channel)
+  }
+  weather, err := service.Weather{}.ForecastFriendly(lat, lng)
+  if err == nil {
     ws.SendMessage("Here's my forecast for " + storedZipCode + ":\n" + weather, m.Channel)
+  } else {
+    ws.SendMessage("My weather source returned an error when I tried to get your forecast.", m.Channel)
   }
 }
 
-func (w Weather) zipCodeProvided(zipcode string, m util.IncomingSlackMessage) {
-  weather, err := service.Weather{}.ForecastFriendly(zipcode)
+func (w Weather) WithZipCode(m util.IncomingSlackMessage, r util.Regex) {
+  zipCode := r.SubExpression(m.Text, 0)
+  lat, lng, err := service.ZipCode{}.ToLatLng(zipCode)
   switch err.(type) {
   case service.BadZipCodeError:
-    ws.SendMessage("It doesn't look like the zipcode you provided is valid. Bummer.", m.Channel)
+    ws.SendMessage("The zip code you gave me doesn't appear to be valid.", m.Channel)
   case error:
-    ws.SendMessage("A really bad error occured during my attempt to predict the future. Of weather. Sorry.", m.Channel)
-  default:
+    ws.SendMessage("I've encountered an error while converting your zipcode into latitude and longitude coordinates.", m.Channel)
+  }
+  weather, err := service.Weather{}.ForecastFriendly(lat, lng)
+  if err == nil {
     ws.SendMessage(weather, m.Channel)
+  } else {
+    ws.SendMessage("My weather source returned an error when I tried to get your forecast.", m.Channel)
   }
 }

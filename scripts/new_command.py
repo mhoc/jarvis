@@ -29,10 +29,6 @@ func (c %s) Description() string {
   return ""
 }
 
-func (c %s) Format() string {
-  return ""
-}
-
 func (c %s) Examples() []string {
   return []string{}
 }
@@ -46,7 +42,7 @@ func (c %s) Execute(m util.IncomingSlackMessage) {
 }
 
 ''' % (
-    name, name, name.lower(), name, name.lower(), name, name, name, name, name
+    name, name, name.lower(), name, name.lower(), name, name, name, name
 )
 
 f.write(content)

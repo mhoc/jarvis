@@ -21,13 +21,6 @@ func (r Remember) Name() string {
   return "remember"
 }
 
-func (r Remember) Matches() []util.Regex {
-  return []util.Regex{
-    util.NewRegex("^jarvis remember that (?P<key>.+) is (?P<value>.+)$"),
-    util.NewRegex("^jarvis know that (?P<key>.+) is (?P<value>.+)$"),
-  }
-}
-
 func (r Remember) Description() string {
   return "instructs jarvis to commit some piece of information to memory.\ninformation has categories which the commit has to reference.\nthus you cant have jarvis remember arbitrary data. rather, only data which jarvis is configured to remember."
 }
@@ -50,12 +43,14 @@ func (r Remember) OtherDocs() []util.HelpTopic {
   }
 }
 
-func (r Remember) Execute(m util.IncomingSlackMessage) {
-  regex := util.NewRegex("that (.+) is (.+)")
-  if !regex.Matches(m.Text) {
-    ws.SendMessage("I can't parse your query. I'm sorry I can't live up to your expectations daddy.", m.Channel)
-    return
+func (r Remember) SubCommands() []util.SubCommand {
+  return []util.SubCommand{
+    util.NewSubCommand("^jarvis remember that (?P<key>.+) is (?P<value>.+)$", r.Save),
+    util.NewSubCommand("^jarvis know that (?P<key>.+) is (?P<value>.+)$", r.Save),
   }
+}
+
+func (r Remember) Save(m util.IncomingSlackMessage, regex util.Regex) {
   key, value := regex.SubExpression(m.Text, 0), regex.SubExpression(m.Text, 1)
   success := data.StoreDatum(key, value, m.User)
   if !success {

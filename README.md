@@ -27,13 +27,13 @@ redis: 'localhost:6379'
 
 # API Tokens
 tokens:
-  
+
   # Slack API token, duh
   slack: token-goes-here
-  
+
   # Darksky for weather api (https://developer.forecast.io)
   darksky: token-goes-here
-  
+
   # Zipcode API (https://www.zipcodeapi.com/)
   zipcode: token-goes-here
 
@@ -50,7 +50,7 @@ location: My Cool Computer
 blacklist:
   - G0123456N
 
-# A channel whitelist. 
+# A channel whitelist.
 # If this list has at least one element, any commands sent to any channel except those in the whitelist will be ignored
 whitelist:
   - G083EQ05N
@@ -97,14 +97,14 @@ My entire continuous integration deployment script on codeship is:
 ssh root@domain.com "cd go/src/github.com/mhoc/jarvis && git pull && supervisorctl reload"
 ```
 
-# FAQ
+# Command Structure (lol)
 
-I use the word "frequently" very lightly.
+My definition of a command is "a set of functionality which can all adequately share a common help topic". Every command has a single help topic, but can define multiple regexes and, if it makes sense, entirely different execution paths for each regex.
 
-* What happens if two commands have overlapping regex definitions?
+First, the regexes. The regexes a command defines for itself should be FULL message matches. An example would be `^jarvis status$`. You can always assume that the first letter of the entire regex is lowercase (to account for mobile keyboard autocorrects). Technically there is nothing stopping you from defining a regex that looks like `status`, but in my opinion the former method makes more sense. For example, check out the `remember` command: what happens if we want to define a user storage key with the word "status" in it?
 
-The answer is that it depends.
+And moreover, I agree that if you only define, say, `status`, it makes for more NLP-like command capability because it would support invokations like "jarvis what is your status" or "jarvis tell me your status". But there's nothing stopping you from crafting a regex, or even multiple regexes, which emulatest he same behavior. It will never be as good, but making the match regexes as conservative as possible helps with... I guess you could call it namespace pollution, really.
 
-For example, if in `config.yaml` you include a `static` definition where `key` is `help`, then I can tell you that jarvis will output both the help text and also your static command.
+These regexes are provided to the command handler (`handlers/command.go`) through the `Matches()` interface method, which returns a `[]util.CommandMatch`. This type is pretty simple; it just ties a Regex statement to a function which takes in a `util.IncomingSlackMessage`.
 
-That being said, providing cleaner command regex definitions is an area of improvement I am looking in to. Right now there are a few commands (see debug) where the command itself checks regexes against the input and might do nothing. There are others which specifically check that the word "jarvis" is in the input (weather.go, debug.go). There are others which don't do this. Its a mess that im going to improve.
+Check out `weather.go` for a perfect example of how to use this and create new commands. The weather command has one purpose: to provide the weather to users. But there's a lot of sub-behavior we need to model, and we model it by crafting different invokation regexes which each have different behavior.

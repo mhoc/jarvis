@@ -46,10 +46,7 @@ func BeginCommandLoop() {
       continue
     }
     FormatCommand(&msg)
-    cmd := MatchCommand(msg)
-    if cmd != nil {
-      go cmd.Execute(msg)
-    }
+    MatchCommand(msg)
   }
 }
 
@@ -67,13 +64,12 @@ func FormatCommand(msg *util.IncomingSlackMessage) {
   msg.Text = strings.Replace(msg.Text, "Jarvis", "jarvis", -1)
 }
 
-func MatchCommand(msg util.IncomingSlackMessage) util.Command {
+func MatchCommand(msg util.IncomingSlackMessage) {
   for _, command := range CommandManifest {
-    for _, regex := range command.Matches() {
-      if regex.Matches(msg.Text) {
-        return command
+    for _, subcommand := range command.SubCommands() {
+      if subcommand.Pattern.Matches(msg.Text) {
+        go subcommand.Exec(msg, subcommand.Pattern)
       }
     }
   }
-  return nil
 }
