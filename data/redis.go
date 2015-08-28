@@ -5,54 +5,56 @@ import (
   "github.com/mhoc/jarvis/config"
   "github.com/mhoc/jarvis/log"
   "github.com/mhoc/jarvis/util"
-  "github.com/xuyu/goredis"
+  "gopkg.in/redis.v3"
   "strings"
   "time"
 )
 
 func CheckRedisConn() {
-  _, err := goredis.Dial(&goredis.DialConfig{Address: config.RedisURI()})
+  client := redis.NewClient(&redis.Options{
+    Addr: config.RedisURI(),
+  })
+  _, err := client.Ping().Result()
   if err != nil {
-    log.Warn("Redis must be running on jarvis' machine")
+    log.Warn("Redis must be running at the URl specificed in config.yaml")
     util.Check(err)
   }
 }
 
-func redisConn() *goredis.Redis {
-  conn, err := goredis.Dial(&goredis.DialConfig{Address: config.RedisURI()})
-  util.Check(err)
-  return conn
+func redisConn() *redis.Client {
+  return redis.NewClient(&redis.Options{
+    Addr: config.RedisURI(),
+  })
 }
 
 func Set(key string, value string) {
   conn := redisConn()
-  err := conn.Set(key, value, 0, 0, false, false)
+  err := conn.Set(key, value, 0).Err()
   util.Check(err)
 }
 
 func SetTimeout(key string, value string, timeout time.Duration) {
   conn := redisConn()
-  err := conn.Set(key, value, int(timeout.Seconds()), 0, false, false)
+  err := conn.Set(key, value, timeout).Err()
   util.Check(err)
 }
 
 func Get(key string) (bool, string) {
   conn := redisConn()
-  resp, err := conn.Get(key)
+  resp, err := conn.Get(key).Result()
   if err != nil && strings.Contains(err.Error(), "WRONGTYPE") {
     return false, ""
   }
-  util.Check(err)
-  if resp == nil {
+  if err != nil && strings.Contains(err.Error(), "nil") {
     return false, ""
-  } else {
-    return true, string(resp)
   }
+  util.Check(err)
+  return true, resp
 }
 
 func Keys(match string) []string {
   conn := redisConn()
-  resp, err := conn.Keys(match)
+  resp, err := conn.Keys(match).Result()
   util.Check(err)
   return resp
 }

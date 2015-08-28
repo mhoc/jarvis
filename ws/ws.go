@@ -49,5 +49,5 @@ func CreateWebsocket(u *url.URL) *websocket.Conn {
 
 func StoreJarvisUserId(d map[string]interface{}) {
   jarvisId := d["self"].(map[string]interface{})["id"].(string)
-  data.Cache("jarvis-user-id", jarvisId)
+  data.Set("jarvis-user-id", jarvisId)
 }

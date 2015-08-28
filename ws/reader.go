@@ -25,7 +25,7 @@ func StartReading() {
     if len(frame) == 0 {
       continue
     }
-    _, jarvisUserId := data.GetCache("jarvis-user-id")
+    _, jarvisUserId := data.Get("jarvis-user-id")
     if sender, in := frame["user"]; in && sender == jarvisUserId {
       log.Trace("Ignoring message sent by jarvis")
       continue

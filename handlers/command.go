@@ -23,6 +23,7 @@ func InitCommands() {
     commands.Debug{}.Name(): commands.NewDebug(),
     commands.Recall{}.Name(): commands.NewRecall(),
     commands.Remember{}.Name(): commands.NewRemember(),
+    commands.Remind{}.Name(): commands.NewRemind(),
     commands.Static{}.Name(): commands.NewStatic(),
     commands.Status{}.Name(): commands.NewStatus(),
     commands.Weather{}.Name(): commands.NewWeather(),
