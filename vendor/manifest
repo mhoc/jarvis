@@ -1,0 +1,29 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/gorilla/websocket",
+			"repository": "https://github.com/gorilla/websocket",
+			"revision": "c66b764651cdca39f42d263b07a507c6e8b58ee9",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/bsm/ratelimit.v1",
+			"repository": "https://gopkg.in/bsm/ratelimit.v1",
+			"revision": "bda20d5067a03094fc6762f7ead53027afac5f28",
+			"branch": "v1"
+		},
+		{
+			"importpath": "gopkg.in/redis.v3",
+			"repository": "https://gopkg.in/redis.v3",
+			"revision": "5d95a32e251b7a05692d61aa8648231e1b7b906f",
+			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/yaml.v2",
+			"repository": "https://gopkg.in/yaml.v2",
+			"revision": "53feefa2559fb8dfa8d81baad31be332c97d6c77",
+			"branch": "v2"
+		}
+	]
+}

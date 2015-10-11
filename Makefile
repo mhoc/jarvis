@@ -1,8 +1,8 @@
 
 build: jarvis
 
-jarvis: deps main.go
-	go build github.com/mhoc/jarvis
+jarvis:
+	gb build
 
 deps:
 	go get gopkg.in/yaml.v2
@@ -10,7 +10,7 @@ deps:
 	go get gopkg.in/redis.v3
 
 clean:
-	rm jarvis
+	rmdir bin pkg
 
 run: build
-	./jarvis
+	./bin/main
