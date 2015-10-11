@@ -21,6 +21,7 @@ func InitCommands() {
   // improving it eventually.
   CommandManifest = map[string]util.Command{
     commands.Debug{}.Name(): commands.NewDebug(),
+    commands.OnionHoroscope{}.Name(): commands.OnionHoroscope{},
     commands.Recall{}.Name(): commands.NewRecall(),
     commands.Remember{}.Name(): commands.NewRemember(),
     commands.Remind{}.Name(): commands.NewRemind(),

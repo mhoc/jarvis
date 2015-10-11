@@ -6,7 +6,9 @@ Or, a worse hubot, depending on how you see it. Probably that one.
 
 # Installing and Running
 
-0. `go get github.com/mhoc/jarvis`
+`gb` is required to build jarvis.
+
+0. `git clone http://github.com/mhoc/jarvis`
 1. Set up `config.yaml` as per the documentation below. It will yell at you if you're missing something big.
 2. Have a redis instance running on the machine with the URI stored in `config.yaml` under `redis`.
 3. `make` will install all the dependencies. `make run` starts jarvis. Enjoy!
