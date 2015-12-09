@@ -7,7 +7,9 @@
 package data
 
 import (
+  "errors"
   "jarvis/log"
+  "jarvis/util"
 )
 
 type Datum struct {
@@ -43,17 +45,24 @@ func GetDatumFromAlias(target string) (bool, Datum) {
   return false, Datum{}
 }
 
-func StoreDatum(trigger string, value string, user string) bool {
+func StoreDatum(trigger string, value string, user string) error {
   log.Trace("Storing datum %v", trigger)
-  in, dat := GetDatumFromAlias(trigger)
-  if in && dat.UserSpec {
-    Set(dat.Key + user, value)
-  } else if in {
-    Set(dat.Key, value)
-  } else {
-    return false
+  keyValid, dat := GetDatumFromAlias(trigger)
+  if !keyValid {
+    msg := "Appologies, but I don't recognize the type of data you're asking me store.\n"
+    msg += "I'm not a generic key-value store; I can only store pieces of information which my programmers have given defined meaning."
+    return errors.New(msg)
   }
-  return true
+  err := ValidateDatum(dat, value)
+  if err != nil {
+    return err
+  }
+  if dat.UserSpec {
+    Set(dat.Key + user, value)
+  } else {
+    Set(dat.Key, value)
+  }
+  return nil
 }
 
 func GetDatum(trigger string, user string) (bool, string) {
@@ -66,4 +75,16 @@ func GetDatum(trigger string, user string) (bool, string) {
   } else {
     return false, ""
   }
+}
+
+func ValidateDatum(d Datum, value string) error {
+  switch d.Key {
+  case "user-birthday-":
+    return nil
+  case "user-zipcode-":
+    if !util.NewRegex("^[0-9]{5}$").Matches(value) {
+      return errors.New("The zip code you provided doesn't appear to be valid.")
+    }
+  }
+  return nil
 }

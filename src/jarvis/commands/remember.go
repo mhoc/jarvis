@@ -52,9 +52,9 @@ func (r Remember) SubCommands() []util.SubCommand {
 
 func (r Remember) Save(m util.IncomingSlackMessage, regex util.Regex) {
   key, value := regex.SubExpression(m.Text, 0), regex.SubExpression(m.Text, 1)
-  success := data.StoreDatum(key, value, m.User)
-  if !success {
-    ws.SendMessage("I don't recognize the type of data you're asking me to remember.", m.Channel)
+  err := data.StoreDatum(key, value, m.User)
+  if err != nil {
+    ws.SendMessage(err.Error(), m.Channel)
     return
   }
   key = strings.Replace(key, "my", "your", -1)

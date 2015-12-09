@@ -48,6 +48,7 @@ func (r Recall) SubCommands() []util.SubCommand {
     util.NewSubCommand("^jarvis recall (?P<key>.+)$", r.Get),
     util.NewSubCommand("^jarvis get (?P<key>.+)$", r.Get),
     util.NewSubCommand("^jarvis what is (?P<key>.+)$", r.Get),
+    util.NewSubCommand("^jarvis do you know what (?P<key>.+) is\\??", r.Get),
   }
 }
 
