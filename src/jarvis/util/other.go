@@ -3,6 +3,11 @@ package util
 
 import (
   "jarvis/log"
+  "math/rand"
+)
+
+var (
+	letterRunes = []rune("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
 func Check(e error) {
@@ -30,4 +35,16 @@ func MapHasElements(m map[string]interface{}, elements ...string) bool {
     }
   }
   return true
+}
+
+func NewId() string {
+	return NewIdn(10)
+}
+
+func NewIdn(length int) string {
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

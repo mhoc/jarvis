@@ -3,6 +3,7 @@
 package util
 
 import (
+  "errors"
   "fmt"
   "math"
   "strings"
@@ -52,5 +53,12 @@ func StringToDuration(durStr string) (time.Duration, error) {
   durStr = strings.Replace(durStr, " hours", "h", -1)
   durStr = strings.Replace(durStr, " hour", "h", -1)
   durStr = strings.Replace(durStr, " ", "", -1)
-  return time.ParseDuration(durStr)
+  d, err := time.ParseDuration(durStr)
+  if err != nil {
+    return d, errors.New("Apologies, but I can't seem to parse your duration string.")
+  }
+  if d.Hours() < 0 || d.Minutes() < 0 || d.Seconds() < 0 {
+    return d, errors.New("Apologies, but my functionality does not include the recognition of negative time.")
+  }
+  return d, nil
 }
