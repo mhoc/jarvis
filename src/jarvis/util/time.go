@@ -6,6 +6,7 @@ import (
   "errors"
   "fmt"
   "github.com/jinzhu/now"
+  "jarvis/log"
   "math"
   "strings"
   "time"
@@ -64,12 +65,50 @@ func StringToDuration(durStr string) (time.Duration, error) {
   return d, nil
 }
 
+// This is a horribly complex function to convert an "absolute time" into a go time
+// It uses a combination of jinzhu's NOW library and some custom parsing code to
+// give the best user experience possible.
 func StringToTime(ts string) (time.Time, error) {
-  stockErr := errors.New("Apologies, but I can't seem to read the time you gave me.")
-  t, err := now.Parse(ts)
+  defaultErr := errors.New("Apologies, but I can't seem to read the time you gave me.")
+
+  // Case 1: "Remind me at 8 to do X"
+  // NOW will parse this to always mean "8AM of the current day", but I want this to actually mean
+  //  - "8PM Today if it is after 8am today but before 8pm today"
+  //  - "8AM Tomorrow if it is after 8AM today and after 8pm today"
+  works, t, err := parseAbsTimeLoneNumber(ts, defaultErr)
+  if err != nil {
+    return t, err
+  }
+  if works {
+    return t, nil
+  }
+
+  // At this point we pass the timestamp over to NOW to parse
+  t, err = now.Parse(ts)
   fmt.Printf("%v\n", t.String())
   if err != nil {
-    return t, stockErr
+    return t, defaultErr
   }
   return t, nil
+
+}
+
+func parseAbsTimeLoneNumber(ts string, defaultErr error) (bool, time.Time, error) {
+  if NewRegex("^[0-9]{1,2}$").Matches(ts) || NewRegex("^[0-9]{1,2}:[0-9]{2}$").Matches(ts) {
+    log.Trace("Parsing absolute time assuming lone number")
+    t, err := now.Parse(ts)
+    if err != nil {
+      log.Trace("Error: %v\n", err.Error())
+      return false, t, defaultErr
+    }
+    if t.Before(time.Now()) {
+      t = t.Add(12 * time.Hour)
+    }
+    if t.Before(time.Now()) {
+      t = t.Add(12 * time.Hour)
+    }
+    return true, t, nil
+  } else {
+    return false, time.Now(), nil
+  }
 }
