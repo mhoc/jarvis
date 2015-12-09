@@ -5,6 +5,7 @@ import (
   "gopkg.in/yaml.v2"
   "io/ioutil"
   "jarvis/log"
+  "time"
 )
 
 var ConfigFile struct {
@@ -24,6 +25,8 @@ var ConfigFile struct {
 const ConfigLocation = "config.yaml"
 
 func LoadYaml() {
+  log.Info("Setting uptime start time")
+  StartedAt = time.Now()
   log.Info("Loading configuration file")
   ba, err := ioutil.ReadFile(ConfigLocation)
   if err != nil {

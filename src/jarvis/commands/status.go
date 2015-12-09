@@ -33,8 +33,10 @@ func (s Status) OtherDocs() []util.HelpTopic {
 func (s Status) SubCommands() []util.SubCommand {
   return []util.SubCommand{
     util.NewSubCommand("^jarvis status$", s.Report),
-    util.NewSubCommand("^jarvis are you alive$", s.Report),
-    util.NewSubCommand("^jarvis are you awake$", s.Report),
+    util.NewSubCommand("^jarvis are you alive\\??$", s.Confirm),
+    util.NewSubCommand("^jarvis are you awake\\??$", s.Confirm),
+    util.NewSubCommand("^jarvis are you there\\??$", s.Confirm),
+    util.NewSubCommand("^jarvis are you dead\\?$", s.Deny),
   }
 }
 
@@ -43,6 +45,19 @@ func (s Status) Report(m util.IncomingSlackMessage, r util.Regex) {
   version := service.Git{}.LastTag()
   response += "I'm running version " + version
   location := config.Location()
-  response += " on " + location + "."
+  response += " on " + location + ".\n"
+  response += "I have been alive for " + util.DurationToString(config.Uptime()) + "."
+  ws.SendMessage(response, m.Channel)
+}
+
+func (s Status) Confirm(m util.IncomingSlackMessage, r util.Regex) {
+  response := "Absolutely.\n"
+  response += "I have been alive for " + util.DurationToString(config.Uptime()) + "."
+  ws.SendMessage(response, m.Channel)
+}
+
+func (s Status) Deny(m util.IncomingSlackMessage, r util.Regex) {
+  response := "Of course not.\n"
+  response += "I have been alive for " + util.DurationToString(config.Uptime()) + "."
   ws.SendMessage(response, m.Channel)
 }
