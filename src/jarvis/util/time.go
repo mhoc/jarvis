@@ -5,6 +5,7 @@ package util
 import (
   "fmt"
   "math"
+  "strings"
   "time"
 )
 
@@ -40,4 +41,16 @@ func DurationToString(d time.Duration) string {
     }
   }
   return s
+}
+
+func StringToDuration(durStr string) (time.Duration, error) {
+  // Run the duration string through a bunch of processing to get it into a time.Duration format that can be parsed by go
+  durStr = strings.Replace(durStr, " seconds", "s", -1)
+  durStr = strings.Replace(durStr, " second", "s", -1)
+  durStr = strings.Replace(durStr, " minutes", "m", -1)
+  durStr = strings.Replace(durStr, " minute", "m", -1)
+  durStr = strings.Replace(durStr, " hours", "h", -1)
+  durStr = strings.Replace(durStr, " hour", "h", -1)
+  durStr = strings.Replace(durStr, " ", "", -1)
+  return time.ParseDuration(durStr)
 }

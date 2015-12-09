@@ -8,7 +8,6 @@ import (
   "jarvis/service"
   "jarvis/util"
   "jarvis/ws"
-  "strings"
   "time"
 )
 
@@ -47,7 +46,7 @@ func (c Remind) SubCommands() []util.SubCommand {
 func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
   username := service.Slack{}.UserNameFromUserId(m.User)
   durStr, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
-  actDur, err := c.ParseDuration(durStr)
+  actDur, err := util.StringToDuration(durStr)
   if err != nil {
     log.Trace("Incorrect duration string: %v", err.Error())
     ws.SendMessage("I can't seem to parse your duration string.", m.Channel)
@@ -58,18 +57,6 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
   })
   data.SetTimeout(fmt.Sprintf("remind-entry-%v-%v", m.User, time.Now().String()), fmt.Sprintf("Remind %v to %v in %v.", username, note, durStr), actDur)
   ws.SendMessage("Alright. I'll remind you in " + durStr + " to " + note, m.Channel)
-}
-
-func (c Remind) ParseDuration(durStr string) (time.Duration, error) {
-  // Run the duration string through a bunch of processing to get it into a time.Duration format that can be parsed by go
-  durStr = strings.Replace(durStr, " seconds", "s", -1)
-  durStr = strings.Replace(durStr, " second", "s", -1)
-  durStr = strings.Replace(durStr, " minutes", "m", -1)
-  durStr = strings.Replace(durStr, " minute", "m", -1)
-  durStr = strings.Replace(durStr, " hours", "h", -1)
-  durStr = strings.Replace(durStr, " hour", "h", -1)
-  durStr = strings.Replace(durStr, " ", "", -1)
-  return time.ParseDuration(durStr)
 }
 
 func (c Remind) ListReminders(m util.IncomingSlackMessage, r util.Regex) {
