@@ -6,6 +6,7 @@ import (
   "fmt"
   "github.com/gorilla/websocket"
   "jarvis/log"
+  "jarvis/service"
   "jarvis/util"
 )
 
@@ -24,4 +25,9 @@ func SendMessage(message string, channelId string) {
   json, err := json.Marshal(msg)
   util.Check(err)
   wsConnection.WriteMessage(websocket.TextMessage, json)
+}
+
+func SendPrivateMessage(message string, user string) {
+  ch := service.Slack{}.IMChannelFromUserId(user)
+  SendMessage(message, ch)
 }

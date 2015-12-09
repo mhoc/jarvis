@@ -16,16 +16,18 @@ var (
 
 type Reminder struct {
   Id string
-  Target string
+  TargetId string
+  TargetName string
   ToDo string
   OnChannel string
   At time.Time
 }
 
-func NewReminder(target string, todo string, onchannel string, at time.Time) Reminder {
+func NewReminder(targetId string, targetname string, todo string, onchannel string, at time.Time) Reminder {
   return Reminder{
     Id: util.NewId(),
-    Target: target,
+    TargetId: targetId,
+    TargetName: targetname,
     ToDo: todo,
     OnChannel: onchannel,
     At: at,
@@ -46,11 +48,12 @@ func (r Reminder) Send() {
   }
   // TODO: This is probably a race condition
   PendingReminders = append(PendingReminders[:deleteIndex], PendingReminders[deleteIndex+1:]...)
-  ws.SendMessage(r.Target + ", you asked me to remind you to " + r.ToDo + ".", r.OnChannel)
+  ws.SendMessage(r.TargetName + ", you asked me to remind you to " + r.ToDo + ".", r.OnChannel)
+  ws.SendPrivateMessage("Hey there: Don't forget to " + r.ToDo + ".", r.TargetId)
 }
 
 func (r Reminder) String() string {
-  s := fmt.Sprintf("At %v on %v, %v will be reminded to %v", r.At.Format("15:04:15"), r.At.Format("Jan 2"), r.Target, r.ToDo)
+  s := fmt.Sprintf("At %v on %v, %v will be reminded to %v", r.At.Format("15:04:15"), r.At.Format("Jan 2"), r.TargetName, r.ToDo)
   return s
 }
 
@@ -98,7 +101,7 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
   }
 
   // Create and start the reminder
-  rem := NewReminder(username, note, m.Channel, time.Now().Add(actDur))
+  rem := NewReminder(m.User, username, note, m.Channel, time.Now().Add(actDur))
   rem.Start(actDur)
 
   // Cache the reminder in our list of pending reminders
