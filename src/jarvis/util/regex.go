@@ -27,6 +27,11 @@ func (r Regex) Matches(test string) bool {
   return r.goRegex.MatchString(test)
 }
 
+func (r Regex) NSubExpressions(test string) int {
+  res := r.goRegex.FindAllStringSubmatch(test, -1)
+  return len(res[0])
+}
+
 func (r Regex) SubExpression(test string, i int) string {
   res := r.goRegex.FindAllStringSubmatch(test, -1)
   return res[0][i+1]

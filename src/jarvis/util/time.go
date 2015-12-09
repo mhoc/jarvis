@@ -83,6 +83,16 @@ func StringToTime(ts string) (time.Time, error) {
     return t, nil
   }
 
+  // Case 2: "Remind me at 8pm to do X"
+  // NOW cannot parse this, so we help it out a little bit
+  works, t, err = parseAbsTimeWithCycle(ts, defaultErr)
+  if err != nil {
+    return t, err
+  }
+  if works {
+    return t, nil
+  }
+
   // At this point we pass the timestamp over to NOW to parse
   t, err = now.Parse(ts)
   fmt.Printf("%v\n", t.String())
@@ -106,6 +116,41 @@ func parseAbsTimeLoneNumber(ts string, defaultErr error) (bool, time.Time, error
     }
     if t.Before(time.Now()) {
       t = t.Add(12 * time.Hour)
+    }
+    return true, t, nil
+  } else {
+    return false, time.Now(), nil
+  }
+}
+
+// This function could use a lot of optimization
+func parseAbsTimeWithCycle(ts string, defaultErr error) (bool, time.Time, error) {
+  r := NewRegex("[0-9]{1,2}:?([0-9]{2})?(am|pm|AM|PM)")
+  if r.Matches(ts) {
+    log.Trace("Parsing absolute time assuming cyclic number")
+    withoutCycle := strings.Replace(ts, "am", "", -1)
+    withoutCycle = strings.Replace(withoutCycle, "AM", "", -1)
+    withoutCycle = strings.Replace(withoutCycle, "pm", "", -1)
+    withoutCycle = strings.Replace(withoutCycle, "PM", "", -1)
+    t, err := now.Parse(withoutCycle)
+    if err != nil {
+      log.Trace("Error: %v\n", err.Error())
+      return false, t, defaultErr
+    }
+    if t.Hour() > 12 {
+      log.Trace("Time provided is military with cycle; invalid")
+      return false, t, defaultErr
+    }
+    if strings.Contains(ts, "AM") || strings.Contains(ts, "am") {
+      if t.Before(time.Now()) {
+        t = t.Add(24 * time.Hour)
+      }
+    }
+    if strings.Contains(ts, "PM") || strings.Contains(ts, "pm") {
+      t = t.Add(12 * time.Hour)
+      if t.Before(time.Now()) {
+        t = t.Add(24 * time.Hour)
+      }
     }
     return true, t, nil
   } else {
