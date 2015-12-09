@@ -5,6 +5,7 @@ package util
 import (
   "errors"
   "fmt"
+  "github.com/jinzhu/now"
   "math"
   "strings"
   "time"
@@ -61,4 +62,14 @@ func StringToDuration(durStr string) (time.Duration, error) {
     return d, errors.New("Apologies, but my functionality does not include the recognition of negative time.")
   }
   return d, nil
+}
+
+func StringToTime(ts string) (time.Time, error) {
+  stockErr := errors.New("Apologies, but I can't seem to read the time you gave me.")
+  t, err := now.Parse(ts)
+  fmt.Printf("%v\n", t.String())
+  if err != nil {
+    return t, stockErr
+  }
+  return t, nil
 }

@@ -8,6 +8,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/jinzhu/now",
+			"repository": "https://github.com/jinzhu/now",
+			"revision": "ce80572eb55aa0ac839330041ca9db1afa5f1f6c",
+			"branch": "master"
+		},
+		{
 			"importpath": "gopkg.in/bsm/ratelimit.v1",
 			"repository": "https://gopkg.in/bsm/ratelimit.v1",
 			"revision": "bda20d5067a03094fc6762f7ead53027afac5f28",

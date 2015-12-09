@@ -34,8 +34,8 @@ func NewReminder(targetId string, targetname string, todo string, onchannel stri
   }
 }
 
-func (r Reminder) Start(t time.Duration) {
-  time.AfterFunc(t, r.Send)
+func (r Reminder) Start() {
+  time.AfterFunc(r.At.Sub(time.Now()), r.Send)
 }
 
 func (r Reminder) Send() {
@@ -84,6 +84,7 @@ func (c Remind) OtherDocs() []util.HelpTopic {
 func (c Remind) SubCommands() []util.SubCommand {
   return []util.SubCommand{
     util.NewSubCommand("^jarvis remind me in (?P<duration>.+) to (?P<note>.+)$", c.SetDurationReminder),
+    util.NewSubCommand("^jarvis remind me at (?P<time>.+) to (?P<note>.+)$", c.SetAbsoluteReminder),
     util.NewSubCommand("^jarvis list reminders$", c.ListReminders),
     util.NewSubCommand("^jarvis what reminders are you tracking\\??", c.ListReminders),
   }
@@ -102,12 +103,39 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
 
   // Create and start the reminder
   rem := NewReminder(m.User, username, note, m.Channel, time.Now().Add(actDur))
-  rem.Start(actDur)
+  rem.Start()
 
   // Cache the reminder in our list of pending reminders
   PendingReminders = append(PendingReminders, rem)
   ws.SendMessage("Alright. I'll remind you in " + util.DurationToString(actDur) + " to " + note, m.Channel)
 }
+
+func (c Remind) SetAbsoluteReminder(m util.IncomingSlackMessage, r util.Regex) {
+  // Parse absolute time string
+  username := service.Slack{}.UserNameFromUserId(m.User)
+  absTimeString, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
+  t, err := util.StringToTime(absTimeString)
+  if err != nil {
+    log.Trace("Incorrect absolute time string")
+    ws.SendMessage(err.Error(), m.Channel)
+    return
+  }
+
+  // Check to make sure the time they entered is after the current time
+  if time.Now().After(t) {
+    ws.SendMessage("Unfortunately the time you entered exists in the past and I can't travel through time.", m.Channel)
+    return
+  }
+
+  // Send it
+  rem := NewReminder(m.User, username, note, m.Channel, t)
+  rem.Start()
+
+  // Cache the reminder
+  PendingReminders = append(PendingReminders, rem)
+  ws.SendMessage("Alright. I'll remind you in " + util.DurationToString(t.Sub(time.Now())) + " to " + note, m.Channel)
+}
+
 
 func (c Remind) ListReminders(m util.IncomingSlackMessage, r util.Regex) {
   resp := ""
