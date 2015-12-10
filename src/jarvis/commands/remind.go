@@ -94,7 +94,7 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
   // Parse the user's duration string
   username := service.Slack{}.UserNameFromUserId(m.User)
   durStr, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
-  actDur, err := util.StringToDuration(durStr)
+  actDur, err := service.Time{}.StringToDuration(durStr)
   if err != nil {
     log.Trace("Incorrect duration string")
     ws.SendMessage(err.Error(), m.Channel)
@@ -107,14 +107,14 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
 
   // Cache the reminder in our list of pending reminders
   PendingReminders = append(PendingReminders, rem)
-  ws.SendMessage("Alright. I'll remind you in " + util.DurationToString(actDur) + " to " + note, m.Channel)
+  ws.SendMessage("Alright. I'll remind you in " + service.Time{}.DurationToString(actDur) + " to " + note, m.Channel)
 }
 
 func (c Remind) SetAbsoluteReminder(m util.IncomingSlackMessage, r util.Regex) {
   // Parse absolute time string
   username := service.Slack{}.UserNameFromUserId(m.User)
   absTimeString, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
-  t, err := util.StringToTime(absTimeString)
+  t, err := service.Time{}.StringToTime(absTimeString, m.User)
   if err != nil {
     log.Trace("Incorrect absolute time string")
     ws.SendMessage(err.Error(), m.Channel)
@@ -133,7 +133,7 @@ func (c Remind) SetAbsoluteReminder(m util.IncomingSlackMessage, r util.Regex) {
 
   // Cache the reminder
   PendingReminders = append(PendingReminders, rem)
-  ws.SendMessage("Alright. I'll remind you in " + util.DurationToString(t.Sub(time.Now())) + " to " + note, m.Channel)
+  ws.SendMessage("Alright. I'll remind you in " + service.Time{}.DurationToString(t.Sub(time.Now())) + " to " + note, m.Channel)
 }
 
 

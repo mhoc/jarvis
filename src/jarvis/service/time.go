@@ -1,20 +1,21 @@
 
-// Various functions for manipulating time objects
-package util
+package service
 
 import (
   "errors"
   "fmt"
   "github.com/jinzhu/now"
-  "jarvis/log"
   "math"
+  "jarvis/data"
+  "jarvis/log"
+  "jarvis/util"
   "strings"
   "time"
 )
 
-// Replaces the normal duration.String() function with one which formats the
-// data in a much more human readable way.
-func DurationToString(d time.Duration) string {
+type Time struct{}
+
+func (t Time) DurationToString(d time.Duration) string {
   s := ""
   hours := math.Floor(d.Hours())
   if hours > 0 {
@@ -46,7 +47,7 @@ func DurationToString(d time.Duration) string {
   return s
 }
 
-func StringToDuration(durStr string) (time.Duration, error) {
+func (t Time) StringToDuration(durStr string) (time.Duration, error) {
   // Run the duration string through a bunch of processing to get it into a time.Duration format that can be parsed by go
   durStr = strings.Replace(durStr, " seconds", "s", -1)
   durStr = strings.Replace(durStr, " second", "s", -1)
@@ -65,17 +66,41 @@ func StringToDuration(durStr string) (time.Duration, error) {
   return d, nil
 }
 
-// This is a horribly complex function to convert an "absolute time" into a go time
-// It uses a combination of jinzhu's NOW library and some custom parsing code to
-// give the best user experience possible.
-func StringToTime(ts string) (time.Time, error) {
+func (tt Time) StringToTime(ts string, user string) (time.Time, error) {
+
+  // Get the user's prefered timezone
+  in, datum := data.GetDatum("my timezone", user)
+  if !in {
+    return time.Now(), errors.New("I don't seem to have your prefered timezone stored.")
+  }
+  userTz, err := time.LoadLocation(datum)
+  if err != nil {
+    return time.Now(), errors.New("The timezone I have on file for you appears to be invalid.")
+  }
+
+  // Get the current time and then convert it into the user's timezone
+  currentTime := time.Now()
+  currentTime = currentTime.In(userTz)
+
+  // Convert the user's time into the requested time by dep-injecting the
+  // current time down into this computational process
+  t, err := tt.inTz(ts, currentTime)
+  if err != nil {
+    return t, err
+  }
+
+  return t, nil
+
+}
+
+func (tt Time) inTz(ts string, currentTime time.Time) (time.Time, error) {
   defaultErr := errors.New("Apologies, but I can't seem to read the time you gave me.")
 
   // Case 1: "Remind me at 8 to do X"
   // NOW will parse this to always mean "8AM of the current day", but I want this to actually mean
   //  - "8PM Today if it is after 8am today but before 8pm today"
   //  - "8AM Tomorrow if it is after 8AM today and after 8pm today"
-  works, t, err := parseAbsTimeLoneNumber(ts, defaultErr)
+  works, t, err := tt.parseAbsTimeLoneNumber(ts, currentTime, defaultErr)
   if err != nil {
     return t, err
   }
@@ -85,7 +110,7 @@ func StringToTime(ts string) (time.Time, error) {
 
   // Case 2: "Remind me at 8pm to do X"
   // NOW cannot parse this, so we help it out a little bit
-  works, t, err = parseAbsTimeWithCycle(ts, defaultErr)
+  works, t, err = tt.parseAbsTimeWithCycle(ts, currentTime, defaultErr)
   if err != nil {
     return t, err
   }
@@ -95,7 +120,7 @@ func StringToTime(ts string) (time.Time, error) {
 
   // Case 3: "Remind me at 8am tomorrow to do x"
   // NOW cannot parse this
-  works, t, err = parseAbsTimeWithTomorrow(ts, defaultErr)
+  works, t, err = tt.parseAbsTimeWithTomorrow(ts, currentTime, defaultErr)
   if err != nil {
     return t, err
   }
@@ -105,7 +130,6 @@ func StringToTime(ts string) (time.Time, error) {
 
   // At this point we pass the timestamp over to NOW to parse
   t, err = now.Parse(ts)
-  fmt.Printf("%v\n", t.String())
   if err != nil {
     return t, defaultErr
   }
@@ -113,29 +137,34 @@ func StringToTime(ts string) (time.Time, error) {
 
 }
 
-func parseAbsTimeLoneNumber(ts string, defaultErr error) (bool, time.Time, error) {
-  if NewRegex("^[0-9]{1,2}$").Matches(ts) || NewRegex("^[0-9]{1,2}:[0-9]{2}$").Matches(ts) {
+func (tt Time) parseAbsTimeLoneNumber(ts string, currentTime time.Time, defaultErr error) (bool, time.Time, error) {
+  if util.NewRegex("^[0-9]{1,2}$").Matches(ts) || util.NewRegex("^[0-9]{1,2}:[0-9]{2}$").Matches(ts) {
     log.Trace("Parsing absolute time assuming lone number")
     t, err := now.Parse(ts)
     if err != nil {
       log.Trace("Error: %v\n", err.Error())
       return false, t, defaultErr
     }
-    if t.Before(time.Now()) {
-      t = t.Add(12 * time.Hour)
-    }
-    if t.Before(time.Now()) {
-      t = t.Add(12 * time.Hour)
+    if t.Hour() > 12 {
+      if t.Before(currentTime) {
+        t = t.Add(24 * time.Hour)
+      }
+    } else {
+      if t.Before(currentTime) {
+        t = t.Add(12 * time.Hour)
+      }
+      if t.Before(currentTime) {
+        t = t.Add(12 * time.Hour)
+      }
     }
     return true, t, nil
   } else {
-    return false, time.Now(), nil
+    return false, currentTime, nil
   }
 }
 
-// This function could use a lot of optimization
-func parseAbsTimeWithCycle(ts string, defaultErr error) (bool, time.Time, error) {
-  r := NewRegex("^[0-9]{1,2}:?([0-9]{2})?(am|pm|AM|PM)$")
+func (tt Time) parseAbsTimeWithCycle(ts string, currentTime time.Time, defaultErr error) (bool, time.Time, error) {
+  r := util.NewRegex("^[0-9]{1,2}:?([0-9]{2})?(am|pm|AM|PM)$")
   if r.Matches(ts) {
     log.Trace("Parsing absolute time assuming cyclic number")
     withoutCycle := strings.Replace(ts, "am", "", -1)
@@ -152,24 +181,24 @@ func parseAbsTimeWithCycle(ts string, defaultErr error) (bool, time.Time, error)
       return false, t, defaultErr
     }
     if strings.Contains(ts, "AM") || strings.Contains(ts, "am") {
-      if t.Before(time.Now()) {
+      if t.Before(currentTime) {
         t = t.Add(24 * time.Hour)
       }
     }
     if strings.Contains(ts, "PM") || strings.Contains(ts, "pm") {
       t = t.Add(12 * time.Hour)
-      if t.Before(time.Now()) {
+      if t.Before(currentTime) {
         t = t.Add(24 * time.Hour)
       }
     }
     return true, t, nil
   } else {
-    return false, time.Now(), nil
+    return false, currentTime, nil
   }
 }
 
-func parseAbsTimeWithTomorrow(ts string, defaultErr error) (bool, time.Time, error) {
-  r := NewRegex("^[0-9]{1,2}:?([0-9]{2})?(am|pm|AM|PM) [Tt]omorrow$")
+func (tt Time) parseAbsTimeWithTomorrow(ts string, currentTime time.Time, defaultErr error) (bool, time.Time, error) {
+  r := util.NewRegex("^[0-9]{1,2}:?([0-9]{2})?(am|pm|AM|PM) [Tt]omorrow$")
   if r.Matches(ts) {
     log.Trace("Parsing absolute time assuming cycling time with tomorrow")
     withoutCycle := strings.Replace(ts, " Tomorrow", "", -1)
@@ -195,6 +224,6 @@ func parseAbsTimeWithTomorrow(ts string, defaultErr error) (bool, time.Time, err
     }
     return true, t, nil
   } else {
-    return false, time.Now(), nil
+    return false, currentTime, nil
   }
 }

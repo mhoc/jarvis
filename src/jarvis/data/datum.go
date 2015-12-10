@@ -10,6 +10,7 @@ import (
   "errors"
   "jarvis/log"
   "jarvis/util"
+  "time"
 )
 
 type Datum struct {
@@ -31,6 +32,11 @@ var RegisteredDatums = []Datum {
     Key: "user-zipcode-",
     UserSpec: true,
     Aliases: []string{"my zipcode", "my zip code", "my zip"},
+  },
+  Datum{
+    Key: "user-timezone-",
+    UserSpec: true,
+    Aliases: []string{"my timezone", "my time zone", "my time-zone"},
   },
 }
 
@@ -84,6 +90,14 @@ func ValidateDatum(d Datum, value string) error {
   case "user-zipcode-":
     if !util.NewRegex("^[0-9]{5}$").Matches(value) {
       return errors.New("The zip code you provided doesn't appear to be valid.")
+    }
+  case "user-timezone-":
+    _, err := time.LoadLocation(value)
+    if err != nil {
+      log.Trace("Attempting to store timezone '" + value + "'")
+      msg := "The timezone you provided doesn't appear to be valid.\n"
+      msg += "You need to provide an official IANA timezone, like `America/Indianapolis`."
+      return errors.New(msg)
     }
   }
   return nil
