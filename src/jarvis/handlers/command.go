@@ -4,15 +4,20 @@ package handlers
 import (
   "jarvis/commands"
   "jarvis/config"
+  "jarvis/data"
   "jarvis/log"
   "jarvis/util"
   "jarvis/ws"
   "strings"
+  "time"
 )
 
-var commandRegex = util.NewRegex("^[Jj]arvis [A-Za-z0-9 ]+")
-var CommandManifest map[string]util.Command
-var cmdCh = make(chan util.IncomingSlackMessage)
+var (
+  commandRegex = util.NewRegex("^[Jj]arvis [A-Za-z0-9 ]+")
+  CommandManifest map[string]util.Command
+  cmdCh = make(chan util.IncomingSlackMessage)
+  ratelimitMap = make(map[string]<-chan time.Time)
+)
 
 func InitCommands() {
   log.Info("Initing command listener")
@@ -34,8 +39,11 @@ func InitCommands() {
 }
 
 func BeginCommandLoop() {
+  shitlist := data.GetShitlist()
+  lastShitlistUpdate := time.Now()
   for {
     msg := <-cmdCh
+    send := true
     if !IsCommand(&msg) {
       continue
     }
@@ -47,8 +55,24 @@ func BeginCommandLoop() {
       log.Trace("Running with whitelist. Ignoring message not sent on whitelisted channel %v", msg.Channel)
       continue
     }
-    FormatCommand(&msg)
-    MatchCommand(msg)
+    if time.Now().Sub(lastShitlistUpdate).Minutes() > 10 {
+      shitlist = data.GetShitlist()
+      lastShitlistUpdate = time.Now()
+    }
+    for _, user := range shitlist {
+      if msg.User == user {
+        log.Trace("Shitlisted user trying to send another message, nuke it.")
+        send = false
+        break
+      }
+    }
+    if send {
+      go func() {
+        RatelimitUser(msg)
+        FormatCommand(&msg)
+        MatchCommand(msg)
+      }()
+    }
   }
 }
 
@@ -62,6 +86,16 @@ func IsCommand(msg *util.IncomingSlackMessage) bool {
   return false
 }
 
+// This is a basic ratelimit with burst. I'd like to eventually use the
+// shitlist capability exposed in the data package but right now this
+// should work quite well.
+func RatelimitUser(msg util.IncomingSlackMessage) {
+  if _, in := ratelimitMap[msg.User]; !in {
+    ratelimitMap[msg.User] = time.Tick(1 * time.Second)
+  }
+  <-ratelimitMap[msg.User]
+}
+
 func FormatCommand(msg *util.IncomingSlackMessage) {
   msg.Text = strings.Replace(msg.Text, "Jarvis", "jarvis", -1)
 }
@@ -70,7 +104,7 @@ func MatchCommand(msg util.IncomingSlackMessage) {
   for _, command := range CommandManifest {
     for _, subcommand := range command.SubCommands() {
       if subcommand.Pattern.Matches(msg.Text) {
-        go subcommand.Exec(msg, subcommand.Pattern)
+        subcommand.Exec(msg, subcommand.Pattern)
       }
     }
   }

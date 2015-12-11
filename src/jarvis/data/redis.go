@@ -63,3 +63,20 @@ func Keys(match string) []string {
   util.Check(err)
   return resp
 }
+
+func SetAdd(setname string, value string) {
+  conn := redisConn()
+  err := conn.SAdd(setname, value).Err()
+  util.Check(err)
+}
+
+func SetGet(setname string) []string {
+  conn := redisConn()
+  members, err := conn.SMembers(setname).Result()
+  if err != nil {
+    log.Info(err.Error())
+    return []string{}
+  } else {
+    return members
+  }
+}
