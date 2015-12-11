@@ -4,7 +4,6 @@ package handlers
 import (
   "jarvis/commands"
   "jarvis/config"
-  "jarvis/data"
   "jarvis/log"
   "jarvis/util"
   "jarvis/ws"
@@ -40,11 +39,8 @@ func InitCommands() {
 }
 
 func BeginCommandLoop() {
-  shitlist := data.GetShitlist()
-  lastShitlistUpdate := time.Now()
   for {
     msg := <-cmdCh
-    send := true
     if !IsCommand(&msg) {
       continue
     }
@@ -56,24 +52,15 @@ func BeginCommandLoop() {
       log.Trace("Running with whitelist. Ignoring message not sent on whitelisted channel %v", msg.Channel)
       continue
     }
-    if time.Now().Sub(lastShitlistUpdate).Minutes() > 10 {
-      shitlist = data.GetShitlist()
-      lastShitlistUpdate = time.Now()
+    if config.UserIsBlacklisted(msg.User) {
+      log.Trace("User is blacklisted from running commands")
+      continue
     }
-    for _, user := range shitlist {
-      if msg.User == user {
-        log.Trace("Shitlisted user trying to send another message, nuke it.")
-        send = false
-        break
-      }
-    }
-    if send {
-      go func() {
-        RatelimitUser(msg)
-        FormatCommand(&msg)
-        MatchCommand(msg)
-      }()
-    }
+    go func() {
+      RatelimitUser(msg)
+      FormatCommand(&msg)
+      MatchCommand(msg)
+    }()
   }
 }
 

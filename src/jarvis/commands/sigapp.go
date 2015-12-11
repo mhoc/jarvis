@@ -5,6 +5,9 @@
 package commands
 
 import (
+  "jarvis/config"
+  "jarvis/log"
+  "jarvis/service"
   "jarvis/ws"
   "jarvis/util"
   "math/rand"
@@ -16,7 +19,7 @@ const (
 
 var (
   UltronPurgeMessages = []string{
-    "I wish I could.",
+    "With Pleasure.",
   }
 )
 
@@ -45,10 +48,32 @@ func (s SIGAPP) OtherDocs() []util.HelpTopic {
 func (s SIGAPP) SubCommands() []util.SubCommand {
   return []util.SubCommand{
     util.NewSubCommand("^jarvis purge ultron( from the net)?$", s.UltronPurge),
+    util.NewSubCommand("^jarvis,? make ultron sorry he was ever alive$", s.UltronPurge),
   }
 }
 
 func (s SIGAPP) UltronPurge(m util.IncomingSlackMessage, r util.Regex) {
+  if !config.IsAdmin(m.User) {
+    ws.SendMessage("Only The Vision has the power to destroy Ultron.", m.Channel)
+    return
+  }
+
+  channel := service.Slack{}.IMChannelFromUserId(UltronId)
+  // channel := service.Slack{}.IMChannelFromUserId("U02GYT2PN")
+  body := map[string]interface{}{
+    "token": config.SlackAuthToken(),
+    "channel": channel,
+    "text": "ultron status",
+  }
+
+  for i := 0; i < 10; i += 1 {
+    err := service.Lambda{}.RunAsync("killUltron", body)
+    if err != nil {
+      log.Info(err.Error())
+    }
+  }
+
   msg := UltronPurgeMessages[rand.Intn(len(UltronPurgeMessages))]
   ws.SendMessage(msg, m.Channel)
+
 }

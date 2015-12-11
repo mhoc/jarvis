@@ -11,14 +11,16 @@ import (
 var ConfigFile struct {
   Redis string `yaml:"redis"`
   Tokens struct {
-    Slack string `yaml:"slack"`
     DarkSky string `yaml:"darksky"`
+    Lambda string `yaml:lambda"`
+    Slack string `yaml:"slack"`
     ZipCode string `yaml:"zipcode"`
   }
   Admins []string `yaml:"admins"`
   Location string `yaml:"location"`
-  ChannelWhitelist []string `yaml:"whitelist"`
-  ChannelBlacklist []string `yaml:"blacklist"`
+  ChannelWhitelist []string `yaml:"channel_whitelist"`
+  ChannelBlacklist []string `yaml:"channel_blacklist"`
+  UserBlacklist []string `yaml:"user_blacklist"`
   Static []map[string]interface{} `yaml:"static"`
 }
 
@@ -84,6 +86,10 @@ func ZipCodeAPIToken() string {
   return ConfigFile.Tokens.ZipCode
 }
 
+func LambdaAPIToken() string {
+  return ConfigFile.Tokens.Lambda
+}
+
 func Admins() []string {
   return ConfigFile.Admins
 }
@@ -117,6 +123,15 @@ func ChannelIsWhitelisted(ch string) bool {
 func ChannelIsBlacklisted(ch string) bool {
   for _, i := range ConfigFile.ChannelBlacklist {
     if ch == i {
+      return true
+    }
+  }
+  return false
+}
+
+func UserIsBlacklisted(uid string) bool {
+  for _, i := range ConfigFile.UserBlacklist {
+    if i == uid {
       return true
     }
   }
