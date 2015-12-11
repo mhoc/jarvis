@@ -52,6 +52,11 @@ func Get(key string) (bool, string) {
   return true, resp
 }
 
+func Remove(key string) {
+  conn := redisConn()
+  conn.Del(key).Result()
+}
+
 func Keys(match string) []string {
   conn := redisConn()
   resp, err := conn.Keys(match).Result()

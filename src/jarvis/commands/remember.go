@@ -45,6 +45,7 @@ func (r Remember) OtherDocs() []util.HelpTopic {
 
 func (r Remember) SubCommands() []util.SubCommand {
   return []util.SubCommand{
+    util.NewSubCommand("^jarvis remember (?P<key>.+) is (?P<value>.+)$", r.Save),
     util.NewSubCommand("^jarvis remember that (?P<key>.+) is (?P<value>.+)$", r.Save),
     util.NewSubCommand("^jarvis know that (?P<key>.+) is (?P<value>.+)$", r.Save),
   }

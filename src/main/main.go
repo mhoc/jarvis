@@ -1,6 +1,7 @@
 package main
 
 import (
+  "jarvis/commands"
   "jarvis/config"
   "jarvis/data"
   "jarvis/handlers"
@@ -15,6 +16,7 @@ func main() {
   config.LoadYaml()
   data.CheckRedisConn()
   handlers.Init()
+  commands.StartReminderLoop()
   ws.Init()
   log.Info("Jarvis is live and receiving messages")
   select {}

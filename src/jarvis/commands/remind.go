@@ -2,7 +2,9 @@
 package commands
 
 import (
+  "encoding/json"
   "fmt"
+  "jarvis/data"
   "jarvis/log"
   "jarvis/service"
   "jarvis/util"
@@ -10,50 +12,48 @@ import (
   "time"
 )
 
-var (
-  PendingReminders = make([]Reminder, 0)
-)
-
 type Reminder struct {
   Id string
   TargetId string
-  TargetName string
   ToDo string
   OnChannel string
   At time.Time
 }
 
-func NewReminder(targetId string, targetname string, todo string, onchannel string, at time.Time) Reminder {
+func NewReminder(targetId string, todo string, onchannel string, at time.Time) Reminder {
   return Reminder{
     Id: util.NewId(),
     TargetId: targetId,
-    TargetName: targetname,
     ToDo: todo,
     OnChannel: onchannel,
     At: at,
   }
 }
 
-func (r Reminder) Start() {
-  time.AfterFunc(r.At.Sub(time.Now()), r.Send)
+func ReminderFromJSON(js string) Reminder {
+  var r Reminder
+  json.Unmarshal([]byte(js), &r)
+  return r
+}
+
+func (r Reminder) RedisKey() string {
+  return fmt.Sprintf("reminder-%v-%v", r.TargetId, r.Id)
+}
+
+func (r Reminder) ToJSON() string {
+  b, _ := json.Marshal(r)
+  return string(b)
 }
 
 func (r Reminder) Send() {
-  deleteIndex := -1
-  for i, reminder := range PendingReminders {
-    if reminder.Id == r.Id {
-      deleteIndex = i
-      break
-    }
-  }
-  // TODO: This is probably a race condition
-  PendingReminders = append(PendingReminders[:deleteIndex], PendingReminders[deleteIndex+1:]...)
-  ws.SendMessage(r.TargetName + ", you asked me to remind you to " + r.ToDo + ".", r.OnChannel)
+  name := service.Slack{}.UserNameFromUserId(r.TargetId)
+  ws.SendMessage(name + ", you asked me to remind you to " + r.ToDo + ".", r.OnChannel)
   ws.SendPrivateMessage("Hey there: Don't forget to " + r.ToDo + ".", r.TargetId)
 }
 
 func (r Reminder) String() string {
-  s := fmt.Sprintf("At %v on %v, %v will be reminded to %v", r.At.Format("15:04:15"), r.At.Format("Jan 2"), r.TargetName, r.ToDo)
+  name := service.Slack{}.UserNameFromUserId(r.TargetId)
+  s := fmt.Sprintf("At %v on %v, %v will be reminded to %v", r.At.Format("15:04:15"), r.At.Format("Jan 2"), name, r.ToDo)
   return s
 }
 
@@ -69,12 +69,16 @@ func (c Remind) Name() string {
 
 func (c Remind) Description() string {
   return `allows you to set and view reminders
-if jarvis is reset, all pending reminders will be lost
-setting reminders by duration can be done in units of hours, minutes, and seconds.`
+setting reminders by duration can be done in units of hours, minutes, and seconds.
+reminders can be expected to be sent out within 10 seconds of the scheduled time.
+one user setting more than 25 reminders will cause jarvis to nuke all of them.`
 }
 
 func (c Remind) Examples() []string {
-  return []string{"jarvis remind me in 10 minutes to take out the garbage"}
+  return []string{
+    "jarvis remind me in 10 minutes to take out the garbage",
+    "jarvis remind me at 8am to wake up",
+  }
 }
 
 func (c Remind) OtherDocs() []util.HelpTopic {
@@ -92,7 +96,6 @@ func (c Remind) SubCommands() []util.SubCommand {
 
 func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
   // Parse the user's duration string
-  username := service.Slack{}.UserNameFromUserId(m.User)
   durStr, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
   actDur, err := service.Time{}.StringToDuration(durStr)
   if err != nil {
@@ -101,18 +104,14 @@ func (c Remind) SetDurationReminder(m util.IncomingSlackMessage, r util.Regex) {
     return
   }
 
-  // Create and start the reminder
-  rem := NewReminder(m.User, username, note, m.Channel, time.Now().Add(actDur))
-  rem.Start()
-
-  // Cache the reminder in our list of pending reminders
-  PendingReminders = append(PendingReminders, rem)
+  // Create and put the reminder in redis
+  rem := NewReminder(m.User, note, m.Channel, time.Now().Add(actDur))
+  data.Set(rem.RedisKey(), rem.ToJSON())
   ws.SendMessage("Alright. I'll remind you in " + service.Time{}.DurationToString(actDur) + " to " + note, m.Channel)
 }
 
 func (c Remind) SetAbsoluteReminder(m util.IncomingSlackMessage, r util.Regex) {
   // Parse absolute time string
-  username := service.Slack{}.UserNameFromUserId(m.User)
   absTimeString, note := r.SubExpression(m.Text, 0), r.SubExpression(m.Text, 1)
   t, err := service.Time{}.StringToTime(absTimeString, m.User)
   if err != nil {
@@ -128,22 +127,68 @@ func (c Remind) SetAbsoluteReminder(m util.IncomingSlackMessage, r util.Regex) {
   }
 
   // Send it
-  rem := NewReminder(m.User, username, note, m.Channel, t)
-  rem.Start()
-
-  // Cache the reminder
-  PendingReminders = append(PendingReminders, rem)
+  rem := NewReminder(m.User, note, m.Channel, t)
+  data.Set(rem.RedisKey(), rem.ToJSON())
   ws.SendMessage("Alright. I'll remind you in " + service.Time{}.DurationToString(t.Sub(time.Now())) + " to " + note, m.Channel)
 }
 
 
 func (c Remind) ListReminders(m util.IncomingSlackMessage, r util.Regex) {
-  resp := ""
-  for _, reminder := range PendingReminders {
-    resp += reminder.String() + "\n"
+  resp := "I'm tracking the following reminders for you:\n"
+  reminderKeys := data.Keys(fmt.Sprintf("reminder-%v-*", m.User))
+  for _, remKey := range reminderKeys {
+    _, jsonString := data.Get(remKey)
+    resp += ReminderFromJSON(jsonString).String() + "\n"
   }
   if len(resp) == 0 {
     resp += "I'm not currently tracking any reminders."
   }
   ws.SendMessage(resp, m.Channel)
+}
+
+// This loop reads all the reminders from Redis and
+func StartReminderLoop() {
+  go func() {
+    log.Info("Starting redis read loop on reminders")
+    ticker := time.Tick(10 * time.Second)
+    for range ticker {
+      reminderKeys := data.Keys("reminder-*")
+      for _, remKey := range reminderKeys {
+        _, jsonString := data.Get(remKey)
+        reminder := ReminderFromJSON(jsonString)
+        if time.Now().After(reminder.At) {
+          reminder.Send()
+          data.Remove(reminder.RedisKey())
+        }
+      }
+    }
+  }()
+  go func() {
+    log.Info("Starting redis rate-limit loop on reminders")
+    ticker := time.Tick(60 * time.Second)
+    for range ticker {
+      userCount := make(map[string][]string)
+      reminderKeys := data.Keys("reminder-*")
+      for _, remKey := range reminderKeys {
+        _, jsonString := data.Get(remKey)
+        reminder := ReminderFromJSON(jsonString)
+        if _, in := userCount[reminder.TargetId]; in {
+          userCount[reminder.TargetId] = append(userCount[reminder.TargetId], reminder.RedisKey())
+        } else {
+          userCount[reminder.TargetId] = []string{reminder.RedisKey()}
+        }
+      }
+      for user, keys := range userCount {
+        if len(keys) > 25 {
+          msg := "Sorry to bother you, but it looks like you've scheduled an inordinate number of reminders.\n"
+          msg += "Remember: Jarvis is a shared resource and trying to kill me is the act of a murderous psychopath.\n"
+          msg += "Your reminders have now been nuked. #sorrynotsorry"
+          ws.SendMessage(msg, service.Slack{}.IMChannelFromUserId(user))
+          for _, key := range keys {
+            data.Remove(key)
+          }
+        }
+      }
+    }
+  }()
 }
