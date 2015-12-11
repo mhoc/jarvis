@@ -45,14 +45,18 @@ func (r Remember) OtherDocs() []util.HelpTopic {
 
 func (r Remember) SubCommands() []util.SubCommand {
   return []util.SubCommand{
-    util.NewSubCommand("^jarvis remember (?P<key>.+) is (?P<value>.+)$", r.Save),
-    util.NewSubCommand("^jarvis remember that (?P<key>.+) is (?P<value>.+)$", r.Save),
+    util.NewSubCommand("^jarvis remember (that)? (?P<key>.+) is (?P<value>.+)$", r.Save),
     util.NewSubCommand("^jarvis know that (?P<key>.+) is (?P<value>.+)$", r.Save),
   }
 }
 
 func (r Remember) Save(m util.IncomingSlackMessage, regex util.Regex) {
-  key, value := regex.SubExpression(m.Text, 0), regex.SubExpression(m.Text, 1)
+  var key, value string
+  if regex.NSubExpressions(m.Text) == 2 {
+    key, value = regex.SubExpression(m.Text, 0), regex.SubExpression(m.Text, 1)
+  } else {
+    key, value = regex.SubExpression(m.Text, 1), regex.SubExpression(m.Text, 2)
+  }
   err := data.StoreDatum(key, value, m.User)
   if err != nil {
     ws.SendMessage(err.Error(), m.Channel)

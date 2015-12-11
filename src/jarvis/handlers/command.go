@@ -33,6 +33,7 @@ func InitCommands() {
     commands.Static{}.Name(): commands.NewStatic(),
     commands.Status{}.Name(): commands.NewStatus(),
     commands.Weather{}.Name(): commands.NewWeather(),
+    commands.SIGAPP{}.Name(): commands.NewSIGAPP(),
   }
   ws.SubscribeToMessages(cmdCh)
   go BeginCommandLoop()
@@ -105,6 +106,7 @@ func MatchCommand(msg util.IncomingSlackMessage) {
     for _, subcommand := range command.SubCommands() {
       if subcommand.Pattern.Matches(msg.Text) {
         subcommand.Exec(msg, subcommand.Pattern)
+        return
       }
     }
   }
