@@ -110,7 +110,7 @@ func (n Nuke) Authorize(m util.IncomingSlackMessage, r util.Regex) {
 
 func (n Nuke) Override(m util.IncomingSlackMessage, r util.Regex) {
   if !config.IsAdmin(m.User) {
-    ws.SendMessage("```Nuclear attacks can only be initiated by operates with security clearance Omega 5.```", m.Channel)
+    ws.SendMessage("```Nuclear attacks can only be initiated by operatives with security clearance Omega 5.```", m.Channel)
     return
   }
   PendingAttack.Overridden = true
@@ -137,5 +137,4 @@ func (n Nuke) Override(m util.IncomingSlackMessage, r util.Regex) {
 func (n Nuke) Deescalate(m util.IncomingSlackMessage, r util.Regex) {
   ws.SendMessage("Deescalation confirmed. Launch control is standing down.", m.Channel)
   PendingAttack.Valid = false
-
 }
