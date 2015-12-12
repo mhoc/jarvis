@@ -66,6 +66,20 @@ func (t Time) StringToDuration(durStr string) (time.Duration, error) {
   return d, nil
 }
 
+// Converts a time object into a printable string
+// Ignores date properties on the time and just looks at the hour and minute
+func (tt Time) TimeToStringWithoutDate(t time.Time) string {
+  result := ""
+  hour := t.Hour() % 12
+  result += fmt.Sprintf("%v:%2v", hour, t.Minute())
+  if t.Hour() > 12 {
+    result += "pm"
+  } else {
+    result += "am"
+  }
+  return result
+}
+
 func (tt Time) StringToTime(ts string, user string) (time.Time, error) {
 
   // Get the user's prefered timezone

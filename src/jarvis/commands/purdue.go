@@ -5,9 +5,12 @@
 package commands
 
 import (
+  "fmt"
+  "jarvis/service"
   "jarvis/util"
-  // "jarvis/ws"
-  // "strings"
+  "jarvis/ws"
+  "strings"
+  "time"
 )
 
 type Purdue struct {}
@@ -16,28 +19,85 @@ func NewPurdue() Purdue {
   return Purdue{}
 }
 
-func (r Purdue) Name() string {
+func (p Purdue) Name() string {
   return "purdue"
 }
 
-func (r Purdue) Description() string {
+func (p Purdue) Description() string {
   return "commands specific to purdue university."
 }
 
-func (r Purdue) Examples() []string {
+func (p Purdue) Examples() []string {
   return []string{"jarvis dining menu at earhart today"}
 }
 
-func (r Purdue) OtherDocs() []util.HelpTopic {
+func (p Purdue) OtherDocs() []util.HelpTopic {
   return []util.HelpTopic{}
 }
 
-func (r Purdue) SubCommands() []util.SubCommand {
+func (p Purdue) SubCommands() []util.SubCommand {
   return []util.SubCommand{
-    util.NewSubCommand("^jarvis dining menus? at (?P<location>[^ ]+) ?(today|tomorrow)?$", r.DiningMenu),
+    util.NewSubCommand("^jarvis (breakfast|lunch|dinner) at (?P<location>[^ ]+) (today|tomorrow)$", p.DiningMenu),
+    util.NewSubCommand("^jarvis (breakfast|lunch|dinner) at (?P<location>[^ ]+)$", p.DiningMenuNoDay),
   }
 }
 
-func (p Purdue) DiningMenu(m util.IncomingSlackMessage, r util.Regex) {
+func (p Purdue) DiningMenuNoDay(m util.IncomingSlackMessage, r util.Regex) {
+  meal := strings.ToLower(r.SubExpression(m.Text, 0))
+  location := strings.ToLower(r.SubExpression(m.Text, 1))
+  day := time.Now()
+  p.SendMenus(meal, location, day, m)
+}
 
+func (p Purdue) DiningMenu(m util.IncomingSlackMessage, r util.Regex) {
+  meal := strings.ToLower(r.SubExpression(m.Text, 0))
+  location := strings.ToLower(r.SubExpression(m.Text, 1))
+  var day time.Time
+  if r.SubExpression(m.Text, 2) == "today" {
+    day = time.Now()
+  } else {
+    day = time.Now().Add(24 * time.Hour)
+  }
+  p.SendMenus(meal, location, day, m)
+}
+
+func (p Purdue) SendMenus(meal string, location string, day time.Time, m util.IncomingSlackMessage) {
+  meal = strings.Title(meal)
+  if location != "earhart" && location != "ford" && location != "hillenbrand" && location != "wiley" && location != "windsor" {
+    ws.SendMessage("The location you provided doesn't appear to be an actual dining court.", m.Channel)
+    return
+  }
+  menus, err := service.Purdue{}.GetDiningMenu(location, day)
+  if err != nil {
+    ws.SendMessage(err.Error(), m.Channel)
+    return
+  }
+  var mealObj service.DiningMeal
+  var found bool
+  for _, actMeal := range menus.Meals {
+    if actMeal.Name == meal {
+      mealObj = actMeal
+      found = true
+    }
+  }
+  if !found {
+    ws.SendMessage("The meal you requested doesn't appear to be served on that day.", m.Channel)
+    return
+  }
+  if mealObj.Status == "Closed" {
+    ws.SendMessage("That dining court is not serving any meals at that time.", m.Channel)
+    return
+  }
+  response := fmt.Sprintf("%v is serving %v from %v to %v\n", strings.Title(location), mealObj.Name, mealObj.Hours.StartTime, mealObj.Hours.EndTime)
+  for _, station := range mealObj.Stations {
+    response += fmt.Sprintf("*%v*\n", station.Name)
+    for _, item := range station.Items {
+      response += fmt.Sprintf("> _%v_", item.Name)
+      if item.IsVegetarian {
+        response += " :herb:"
+      }
+      response += "\n"
+    }
+  }
+  ws.SendMessage(response, m.Channel)
 }
