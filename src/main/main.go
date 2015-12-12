@@ -15,6 +15,7 @@ func main() {
   runtime.GOMAXPROCS(runtime.NumCPU())
   config.LoadYaml()
   data.CheckRedisConn()
+  data.InitTeamData()
   handlers.Init()
   commands.StartReminderLoop()
   ws.Init()

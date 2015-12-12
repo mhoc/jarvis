@@ -32,7 +32,7 @@ func InitCommands() {
     commands.Static{}.Name(): commands.NewStatic(),
     commands.Status{}.Name(): commands.NewStatus(),
     commands.Weather{}.Name(): commands.NewWeather(),
-    commands.SIGAPP{}.Name(): commands.NewSIGAPP(),
+    commands.Nuke{}.Name(): commands.NewNuke(),
   }
   ws.SubscribeToMessages(cmdCh)
   go BeginCommandLoop()
@@ -93,6 +93,7 @@ func RatelimitUser(msg util.IncomingSlackMessage) bool {
 func FormatCommand(msg *util.IncomingSlackMessage) {
   msg.Text = strings.Replace(msg.Text, "Jarvis", "jarvis", -1)
   msg.Text = strings.Replace(msg.Text, "jarvis,", "jarvis", -1)
+  msg.Text = strings.Replace(msg.Text, "jarivs", "jarvis", -1)
   if msg.Text[len(msg.Text)-1] == ' ' {
     msg.Text = msg.Text[:len(msg.Text)-2]
   }

@@ -13,6 +13,7 @@ type Slack struct {}
 
 const (
   SLACK_CACHE_UN_FROM_UID_PREFIX = "slack-username-"
+  SLACK_CACHE_UID_FROM_UN_PREFIX = "slack-userid-"
   SLACK_CACHE_IM_FROM_UID_PREFIX = "slack-im-channel-"
 )
 
@@ -27,6 +28,18 @@ func (s Slack) UserNameFromUserId(userId string) string {
     data.Set(SLACK_CACHE_UN_FROM_UID_PREFIX + userId, un)
   }
   return un
+}
+
+func (s Slack) UserIdFromUserName(username string) string {
+  if username[0] == '@' {
+    username = username[1:]
+  }
+  in, uid := data.Get(SLACK_CACHE_UID_FROM_UN_PREFIX + username)
+  if in {
+    return uid
+  } else {
+    return ""
+  }
 }
 
 func (s Slack) IMChannelFromUserId(userId string) string {
