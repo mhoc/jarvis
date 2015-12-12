@@ -14,3 +14,8 @@ clean:
 
 run: build
 	./bin/main
+
+deploy:
+	git pull
+	gb build
+	supervisorctl reload

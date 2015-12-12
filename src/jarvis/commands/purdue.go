@@ -105,6 +105,28 @@ func (p Purdue) SendMenus(meal string, location string, day time.Time, m util.In
       if item.IsVegetarian {
         response += " :herb:"
       }
+      for _, allergen := range item.Allergens {
+        if allergen.Value {
+          switch allergen.Name {
+          case "Eggs":
+            response += " :egg:"
+          case "Gluten":
+            response += " :bread:"
+          case "Fish": case "Shellfish":
+            response += " :fish:"
+          case "Milk":
+            response += " :cow:"
+          case "Peanuts":
+            response += " :chestnut:"
+          case "Soy":
+            response += " :rice:"
+          case "Tree Nuts":
+            response += " :evergreen_tree:"
+          case "Wheat":
+            response += " :ear_of_rice:"
+          }
+        }
+      }
       response += "\n"
     }
   }

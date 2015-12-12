@@ -38,6 +38,12 @@ type DiningItem struct {
   Id string `json:"ID"`
   Name string `json:"Name"`
   IsVegetarian bool `json:"IsVegetarian"`
+  Allergens []DiningAllergen `json:"Allergens"`
+}
+
+type DiningAllergen struct {
+  Name string `json:"Name"`
+  Value bool `json:"Value"`
 }
 
 type Purdue struct {}
