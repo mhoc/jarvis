@@ -29,6 +29,16 @@ func Warn(s string, args ...interface{}) {
   fmt.Printf(fmt.Sprintf("%v%v\n", FormatColor(Prefix(), YELLOW), s), args...)
 }
 
+func Error(e error) bool {
+  if e != nil {
+    s := e.Error()
+    s = strings.Replace(s, "\n", " ", -1)
+    fmt.Printf("%v\n", s)
+    return true
+  }
+  return false
+}
+
 func Fatal(s string, args ...interface{}) {
   s = strings.Replace(s, "\n", " ", -1)
   fmt.Printf(fmt.Sprintf("%v\n", FormatColor(Prefix() + s, BOLD_RED)), args...)
