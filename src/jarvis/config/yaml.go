@@ -12,9 +12,12 @@ var ConfigFile struct {
   Redis string `yaml:"redis"`
   Tokens struct {
     DarkSky string `yaml:"darksky"`
-    Lambda string `yaml:lambda"`
     Slack string `yaml:"slack"`
     ZipCode string `yaml:"zipcode"`
+    Aws struct {
+      Access string `yaml:"access"`
+      Secret string `yaml:"secret"`
+    } `yaml:"aws"`
   }
   Admins []string `yaml:"admins"`
   Location string `yaml:"location"`
@@ -86,8 +89,8 @@ func ZipCodeAPIToken() string {
   return ConfigFile.Tokens.ZipCode
 }
 
-func LambdaAPIToken() string {
-  return ConfigFile.Tokens.Lambda
+func AwsCredentials() (string, string) {
+  return ConfigFile.Tokens.Aws.Access, ConfigFile.Tokens.Aws.Secret
 }
 
 func Admins() []string {
