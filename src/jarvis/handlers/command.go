@@ -57,9 +57,10 @@ func BeginCommandLoop() {
       continue
     }
     go func() {
-      RatelimitUser(msg)
-      FormatCommand(&msg)
-      MatchCommand(msg)
+      if RatelimitUser(msg) {
+        FormatCommand(&msg)
+        MatchCommand(msg)
+      }
     }()
   }
 }
@@ -77,15 +78,24 @@ func IsCommand(msg *util.IncomingSlackMessage) bool {
 // This is a basic ratelimit with burst. I'd like to eventually use the
 // shitlist capability exposed in the data package but right now this
 // should work quite well.
-func RatelimitUser(msg util.IncomingSlackMessage) {
+func RatelimitUser(msg util.IncomingSlackMessage) bool {
   if _, in := ratelimitMap[msg.User]; !in {
     ratelimitMap[msg.User] = time.Tick(1 * time.Second)
   }
-  <-ratelimitMap[msg.User]
+  select {
+  case <-ratelimitMap[msg.User]:
+    return true
+  default:
+    return false
+  }
 }
 
 func FormatCommand(msg *util.IncomingSlackMessage) {
   msg.Text = strings.Replace(msg.Text, "Jarvis", "jarvis", -1)
+  msg.Text = strings.Replace(msg.Text, "jarvis,", "jarvis", -1)
+  if msg.Text[len(msg.Text)-1] == ' ' {
+    msg.Text = msg.Text[:len(msg.Text)-2]
+  }
 }
 
 func MatchCommand(msg util.IncomingSlackMessage) {
