@@ -28,11 +28,20 @@ func (p Purdue) Description() string {
 }
 
 func (p Purdue) Examples() []string {
-  return []string{"jarvis dining menu at earhart today"}
+  return []string{"jarvis lunch at earhart today"}
 }
 
 func (p Purdue) OtherDocs() []util.HelpTopic {
-  return []util.HelpTopic{}
+  return []util.HelpTopic{
+    util.HelpTopic{
+      Name: "dining court locations",
+      Body: "earhart, ford, hillenbrand, wiley, windsor",
+    },
+    util.HelpTopic{
+      Name: "dining court meals",
+      Body: "breakfast, lunch, dinner",
+    },
+  }
 }
 
 func (p Purdue) SubCommands() []util.SubCommand {
