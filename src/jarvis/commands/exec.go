@@ -41,10 +41,15 @@ func (c Exec) SubCommands() []util.SubCommand {
 
 func (c Exec) Python(m util.IncomingSlackMessage, r util.Regex) {
   command := r.SubExpression(m.Text, 0)
-  result, err := service.Docker{}.RunCommandInContainer("python", "python -c \"" + command + "\"", 10 * time.Second)
+  result, err := service.Docker{}.RunPythonInContainer(command, 10 * time.Second)
+  if result[len(result)-1] == '\n' {
+    result = result[:len(result)-1]
+  }
   if err != nil {
     ws.SendMessage(err.Error(), m.Channel)
   } else {
-    ws.SendMessage(result, m.Channel)
+    msg := "Result:\n```"
+    msg += result + "\n```"
+    ws.SendMessage(msg, m.Channel)
   }
 }

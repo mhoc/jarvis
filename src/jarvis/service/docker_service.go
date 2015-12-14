@@ -3,8 +3,9 @@ package service
 
 import (
   "fmt"
+  "jarvis/log"
   "os/exec"
-  "strings"
+  // "strings"
   "time"
 )
 
@@ -15,14 +16,17 @@ type CommandResult struct {
 
 type Docker struct {}
 
-func (d Docker) RunCommandInContainer(image string, command string, timeout time.Duration) (string, error) {
+func (d Docker) RunPythonInContainer(command string, timeout time.Duration) (string, error) {
+  log.Info("Executing command '%v' in container 'python'", command)
   resultCh := make(chan CommandResult)
   go func() {
-    sp := []string{"run", image}
-    for _, cmd := range strings.Split(command, " ") {
-      sp = append(sp, cmd)
+    out, err := exec.Command("docker", "run", "python", "python", "-c", command).Output()
+    log.Trace("Result: %v", string(out))
+    if err != nil {
+      log.Trace("Error: %v", err.Error())
+    } else {
+      log.Trace("No error")
     }
-    out, err := exec.Command("docker", sp...).Output()
     resultCh <- CommandResult{
       Text: string(out),
       Error: err,
