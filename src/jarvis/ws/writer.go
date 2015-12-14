@@ -8,9 +8,15 @@ import (
   "jarvis/log"
   "jarvis/service"
   "jarvis/util"
+  "time"
+)
+
+var (
+  MasterWriteLimiter = time.Tick(2 * time.Second)
 )
 
 func SendMessage(message string, channelId string) {
+  <-MasterWriteLimiter
   if len(message) > 25 {
     log.Trace(fmt.Sprintf("Writing message '%v...' to channel '%v'", message[:24], channelId))
   } else {
