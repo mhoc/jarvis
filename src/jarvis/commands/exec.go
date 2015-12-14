@@ -42,8 +42,10 @@ func (c Exec) SubCommands() []util.SubCommand {
 func (c Exec) Python(m util.IncomingSlackMessage, r util.Regex) {
   command := r.SubExpression(m.Text, 0)
   result, err := service.Docker{}.RunPythonInContainer(command, 10 * time.Second)
-  if result[len(result)-1] == '\n' {
-    result = result[:len(result)-1]
+  if len(result) > 0 {
+    if result[len(result)-1] == '\n' {
+      result = result[:len(result)-1]
+    }
   }
   if err != nil {
     ws.SendMessage(err.Error(), m.Channel)
