@@ -18,7 +18,7 @@ func SendMessage(message string, channelId string) {
   }
   if len(message) > 1000 {
     log.Trace("Attempting to send message that is far too large")
-    message = "The message I just attempted to send you exceed Slack's maximum message length."
+    message = "The message I just attempted to send you exceeds Slack's maximum message length."
   }
   msg := util.OutgoingSlackMessage{
     Channel: channelId,

@@ -82,7 +82,7 @@ func IsCommand(msg *util.IncomingSlackMessage) bool {
 // should work quite well.
 func RatelimitUser(msg util.IncomingSlackMessage) bool {
   if _, in := ratelimitMap[msg.User]; !in {
-    ratelimitMap[msg.User] = time.Tick(1 * time.Second)
+    ratelimitMap[msg.User] = time.Tick(5 * time.Second)
     time.Sleep(1 * time.Second)
   }
   select {
