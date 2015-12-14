@@ -19,7 +19,7 @@ type Docker struct {}
 func (d Docker) RunShInContainer(command string, timeout time.Duration) (string, error) {
   log.Info("Executing command '%v' in container 'ubuntu'", command)
   resultCh := make(chan CommandResult)
-  args := []string{"run", "ubuntu"}
+  args := []string{"run", "--rm", "ubuntu"}
   for _, userArg := range strings.Split(command, " ") {
     args = append(args, userArg)
   }
@@ -49,7 +49,7 @@ func (d Docker) RunShInContainer(command string, timeout time.Duration) (string,
 func (d Docker) RunPythonInContainer(command string, timeout time.Duration) (string, error) {
   log.Info("Executing command '%v' in container 'python'", command)
   resultCh := make(chan CommandResult)
-  cmd := exec.Command("docker", "run", "python", "python", "-c", command)
+  cmd := exec.Command("docker", "run", "--rm", "python", "python", "-c", command)
   go func() {
     out, err := cmd.Output()
     log.Trace("Result: %v", string(out))
