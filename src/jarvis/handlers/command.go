@@ -34,6 +34,7 @@ func InitCommands() {
     commands.Weather{}.Name(): commands.NewWeather(),
     commands.Nuke{}.Name(): commands.NewNuke(),
     commands.Purdue{}.Name(): commands.NewPurdue(),
+    commands.Exec{}.Name(): commands.NewExec(),
   }
   ws.SubscribeToMessages(cmdCh)
   go BeginCommandLoop()
