@@ -23,6 +23,7 @@ var ConfigFile struct {
   Location string `yaml:"location"`
   ChannelWhitelist []string `yaml:"channel_whitelist"`
   ChannelBlacklist []string `yaml:"channel_blacklist"`
+  Announcements []string `yaml:"announcements"`
   UserBlacklist []string `yaml:"user_blacklist"`
   Static []map[string]interface{} `yaml:"static"`
 }
@@ -95,6 +96,10 @@ func AwsCredentials() (string, string) {
 
 func Admins() []string {
   return ConfigFile.Admins
+}
+
+func AnnounceChannels() []string {
+  return ConfigFile.Announcements
 }
 
 func IsAdmin(userid string) bool {

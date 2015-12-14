@@ -19,6 +19,7 @@ func main() {
   handlers.Init()
   commands.StartReminderLoop()
   ws.Init()
+  handlers.Announce()
   log.Info("Jarvis is live and receiving messages")
   select {}
 }

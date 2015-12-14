@@ -12,7 +12,7 @@ import (
 )
 
 var (
-  MasterWriteLimiter = time.Tick(2 * time.Second)
+  MasterWriteLimiter = time.Tick(1 * time.Second)
 )
 
 func SendMessage(message string, channelId string) {
