@@ -49,14 +49,14 @@ func (c Exec) Python(m util.IncomingSlackMessage, r util.Regex) {
   }
   var msg string
   if result != "" {
-    msg := "Result: \n```"
+    msg = "Result: \n```"
     msg += result + "\n```"
     if err != nil {
       msg += "\n"
     }
   }
   if err != nil {
-    msg := "Your command resulted in an error:\n```"
+    msg = "Your command resulted in an error:\n```"
     msg += err.Error() + "\n```"
   }
   if len(msg) == 0 {
