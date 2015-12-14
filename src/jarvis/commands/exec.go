@@ -47,11 +47,20 @@ func (c Exec) Python(m util.IncomingSlackMessage, r util.Regex) {
       result = result[:len(result)-1]
     }
   }
-  if err != nil {
-    ws.SendMessage(err.Error(), m.Channel)
-  } else {
-    msg := "Result:\n```"
+  var msg string
+  if result != "" {
+    msg := "Result: \n```"
     msg += result + "\n```"
-    ws.SendMessage(msg, m.Channel)
+    if err != nil {
+      msg += "\n"
+    }
   }
+  if err != nil {
+    msg := "Your command resulted in an error:\n```"
+    msg += err.Error() + "\n```"
+  }
+  if len(msg) == 0 {
+    msg = "Your command generated no output."
+  }
+  ws.SendMessage(msg, m.Channel)
 }

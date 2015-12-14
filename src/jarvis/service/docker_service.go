@@ -19,8 +19,9 @@ type Docker struct {}
 func (d Docker) RunPythonInContainer(command string, timeout time.Duration) (string, error) {
   log.Info("Executing command '%v' in container 'python'", command)
   resultCh := make(chan CommandResult)
+  cmd := exec.Command("docker", "run", "python", "python", "-c", command)
   go func() {
-    out, err := exec.Command("docker", "run", "python", "python", "-c", command).Output()
+    out, err := cmd.Output()
     log.Trace("Result: %v", string(out))
     if err != nil {
       log.Trace("Error: %v", err.Error())
@@ -36,6 +37,7 @@ func (d Docker) RunPythonInContainer(command string, timeout time.Duration) (str
   case res := <-resultCh:
     return res.Text, res.Error
   case <-time.After(timeout):
-    return "", fmt.Errorf("Your command took longer than %v to run.", Time{}.DurationToString(timeout))
+    cmd.Process.Kill()
+    return "", fmt.Errorf("Your command took longer than %v to run and has thus been killed.", Time{}.DurationToString(timeout))
   }
 }
