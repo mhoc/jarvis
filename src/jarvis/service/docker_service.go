@@ -5,7 +5,7 @@ import (
   "fmt"
   "jarvis/log"
   "os/exec"
-  // "strings"
+  "strings"
   "time"
 )
 
@@ -19,7 +19,11 @@ type Docker struct {}
 func (d Docker) RunShInContainer(command string, timeout time.Duration) (string, error) {
   log.Info("Executing command '%v' in container 'ubuntu'", command)
   resultCh := make(chan CommandResult)
-  cmd := exec.Command("docker", "run", "ubuntu", command)
+  args := []string{"run", "ubuntu"}
+  for _, userArg := range strings.Split(command, " ") {
+    args = append(args, userArg)
+  }
+  cmd := exec.Command("docker", args...)
   go func() {
     out, err := cmd.Output()
     log.Trace("Result: %v", string(out))
