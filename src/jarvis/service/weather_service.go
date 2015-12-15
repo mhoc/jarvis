@@ -1,22 +1,21 @@
-
 package service
 
 import (
-  "fmt"
-  "jarvis/config"
-  "jarvis/log"
-  "jarvis/util"
+	"fmt"
+	"jarvis/config"
+	"jarvis/log"
+	"jarvis/util"
 )
 
-type Weather struct {}
+type Weather struct{}
 
 func (w Weather) ForecastFriendly(lat float64, lng float64) (string, error) {
-  log.Trace("Getting friendly weather report for %v %v", lat, lng)
-  url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", config.DarkSkyAPIToken(), lat, lng)
-  data, err := util.HttpGet(url)
-  if err == nil {
-    return data["hourly"].(map[string]interface{})["summary"].(string), nil
-  } else {
-    return "", err
-  }
+	log.Trace("Getting friendly weather report for %v %v", lat, lng)
+	url := fmt.Sprintf("https://api.forecast.io/forecast/%v/%v,%v", config.DarkSkyAPIToken(), lat, lng)
+	data, err := util.HttpGet(url)
+	if err == nil {
+		return data["hourly"].(map[string]interface{})["summary"].(string), nil
+	} else {
+		return "", err
+	}
 }
