@@ -82,6 +82,8 @@ func (n Nuke) Authorize(m util.IncomingSlackMessage, r util.Regex) {
 		return
 	}
 	channel := service.Slack{}.IMChannelFromUserId(PendingAttack.Against)
+	PendingAttack.Valid = false
+	PendingAttack.Overridden = false
 	ws.SendMessage("```Authorization confirmed. Commencing launch.```", m.Channel)
 	time.AfterFunc(5*time.Second, func() {
 		ws.SendMessage("```Target identified. Calibrating missile guidance systems.```", m.Channel)
@@ -100,8 +102,6 @@ func (n Nuke) Authorize(m util.IncomingSlackMessage, r util.Regex) {
 						log.Info(err.Error())
 					}
 				}
-				PendingAttack.Valid = false
-				PendingAttack.Overridden = false
 			})
 		})
 	})
