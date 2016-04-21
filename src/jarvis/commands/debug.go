@@ -68,10 +68,7 @@ func (c Debug) Suicide(m util.IncomingSlackMessage, r util.Regex) {
 }
 
 func (c Debug) Info(m util.IncomingSlackMessage, r util.Regex) {
-	if !c.IsAdmin(m) {
-		return
-	}
-	resp := "You are user " + m.User + "\n"
-	resp += "We are in channel " + m.Channel
+	resp := "You are user `" + m.User + "`\n"
+	resp += "We are in channel `" + m.Channel + "`"
 	ws.SendMessage(resp, m.Channel)
 }
