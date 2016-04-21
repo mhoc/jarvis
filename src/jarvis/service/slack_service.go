@@ -41,7 +41,10 @@ func (s Slack) UserIdFromUserName(username string) string {
 	}
 }
 
-func (s Slack) IMChannelFromUserId(userId string) string {
+func (s Slack) IMChannelFromUserId(userId string) (string, error) {
+	if data.JarvisUserId() == userId {
+		return "", fmt.Errorf("You cannot open a channel to yourself")
+	}
 	in, ch := data.Get(SLACK_CACHE_IM_FROM_UID_PREFIX + userId)
 	if !in {
 		log.Trace("Getting IM channel for user %v", userId)
@@ -51,5 +54,5 @@ func (s Slack) IMChannelFromUserId(userId string) string {
 		ch = slackData["channel"].(map[string]interface{})["id"].(string)
 		data.Set(SLACK_CACHE_IM_FROM_UID_PREFIX+userId, ch)
 	}
-	return ch
+	return ch, nil
 }

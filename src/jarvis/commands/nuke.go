@@ -81,7 +81,11 @@ func (n Nuke) Authorize(m util.IncomingSlackMessage, r util.Regex) {
 		ws.SendMessage("There are no nuclear attacks pending.", m.Channel)
 		return
 	}
-	channel := service.Slack{}.IMChannelFromUserId(PendingAttack.Against)
+	channel, err := service.Slack{}.IMChannelFromUserId(PendingAttack.Against)
+	if err != nil {
+		ws.SendMessage("Jarvis cannot nuke himself, idiot", m.Channel)
+		return
+	}
 	PendingAttack.Valid = false
 	PendingAttack.Overridden = false
 	ws.SendMessage("```Authorization confirmed. Commencing launch.```", m.Channel)

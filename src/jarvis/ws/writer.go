@@ -37,6 +37,9 @@ func SendMessage(message string, channelId string) {
 }
 
 func SendPrivateMessage(message string, user string) {
-	ch := service.Slack{}.IMChannelFromUserId(user)
+	ch, err := service.Slack{}.IMChannelFromUserId(user)
+	if err != nil {
+		return
+	}
 	SendMessage(message, ch)
 }

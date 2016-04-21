@@ -181,10 +181,14 @@ func StartReminderLoop() {
 					msg := "Sorry to bother you, but it looks like you've scheduled an inordinate number of reminders.\n"
 					msg += "Remember: Jarvis is a shared resource and trying to kill me is the act of a murderous psychopath.\n"
 					msg += "Your reminders have now been nuked. #sorrynotsorry"
-					ws.SendMessage(msg, service.Slack{}.IMChannelFromUserId(user))
 					for _, key := range keys {
 						data.Remove(key)
 					}
+					ch, err := service.Slack{}.IMChannelFromUserId(user)
+					if err != nil {
+						return
+					}
+					ws.SendMessage(msg, ch)
 				}
 			}
 		}
