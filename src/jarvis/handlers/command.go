@@ -31,7 +31,6 @@ func InitCommands() {
 		commands.Static{}.Name():         commands.NewStatic(),
 		commands.Status{}.Name():         commands.NewStatus(),
 		commands.Weather{}.Name():        commands.NewWeather(),
-		commands.Nuke{}.Name():           commands.NewNuke(),
 		commands.Purdue{}.Name():         commands.NewPurdue(),
 		commands.Exec{}.Name():           commands.NewExec(),
 	}
